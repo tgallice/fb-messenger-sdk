@@ -1,0 +1,4 @@
+suites:
+    suite:
+        namespace: Tgallice\FBMessenger
+        psr4_prefix: Tgallice\FBMessenger

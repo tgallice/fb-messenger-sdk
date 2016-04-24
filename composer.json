@@ -1,0 +1,38 @@
+{
+  "name": "tgallice/fb-messenger-sdk",
+  "description": "Facebook Messenger Bot php sdk",
+  "minimum-stability": "stable",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Thomas Gallice",
+      "email": "tm.gallice@gmail.com"
+    }
+  ],
+  "keywords": [
+    "facebook",
+    "messenger",
+    "bot messenger",
+    "facebook messenger",
+    "bot",
+    "conversation",
+    "bot conversation"
+  ],
+  "autoload": {
+    "psr-4": {
+      "Tgallice\\FBMessenger\\": "src"
+    }
+  },
+  "require": {
+    "php": ">=5.5.9",
+    "guzzlehttp/guzzle": "^6.2"
+  },
+  "require-dev": {
+    "phpspec/phpspec": "^2.5"
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.0.x-dev"
+    }
+  }
+}
