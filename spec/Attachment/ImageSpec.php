@@ -45,11 +45,33 @@ class ImageSpec extends ObjectBehavior
         $this->getPayload()->shouldReturn([]);
     }
 
+    function it_should_return_if_its_a_remote_file()
+    {
+        $this->isRemoteFile()->shouldReturn(false);
+    }
+
     function it_allow_jpg_local_file()
     {
         $this->generateFile('.jpg');
 
         $this->beConstructedWith($this->_filename);
+        $this->isRemoteFile()->shouldReturn(false);
+    }
+
+    function it_allow_remote_file()
+    {
+        $this->beConstructedWith('http://www.file.com/file.png');
+        $this->getPayload()->shouldReturn([
+            'url' => 'http://www.file.com/file.png',
+        ]);
+        $this->isRemoteFile()->shouldReturn(true);
+    }
+
+    function it_should_not_open_remote_file()
+    {
+        $this->beConstructedWith('http://www.file.com/file.png');
+        $this->shouldThrow(new \RuntimeException('A remote file can not be open'))
+            ->duringOpen();
     }
 
     function it_throws_exception_when_the_file_is_not_a_png_or_a_jpg()
@@ -58,7 +80,7 @@ class ImageSpec extends ObjectBehavior
 
         $this->beConstructedWith($this->_filename);
         $exception = new \InvalidArgumentException(
-            sprintf('"%s" this file has not a allowed extension. Only "png" and "jpg" image are supported', $this->_filename)
+            sprintf('"%s" this file has not an allowed extension. Only "png" and "jpg" image are supported', $this->_filename)
         );
 
         $this->shouldThrow($exception)->duringInstantiation();

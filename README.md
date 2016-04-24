@@ -105,7 +105,6 @@ $response = $messenger->sendMessage($message);
 require_once __DIR__.'/vendor/autoload.php';
 
 use Tgallice\FBMessenger\Attachment\Image;
-use Tgallice\FBMessenger\Attachment\ImageUrl;
 use Tgallice\FBMessenger\Message\Message;
 use Tgallice\FBMessenger\Messenger;
 
@@ -123,7 +122,7 @@ $message = new Message('<USER_ID>', $image);
 $response = $messenger->sendMessage($message);
 
 // Remote file
-$image = new ImageUrl('http://www.site.com/image.jpg');
+$image = new Image('http://www.site.com/image.jpg');
 $message = new Message('<USER_ID>', $image);
 
 $response = $messenger->sendMessage($message);

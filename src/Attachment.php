@@ -41,7 +41,7 @@ abstract class Attachment implements \JsonSerializable
     {
         return [
             'type' => $this->type,
-            'payload' => $this->getPayload(),
+            'payload' => $this->payload,
         ];
     }
 }
