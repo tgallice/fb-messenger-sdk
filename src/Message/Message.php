@@ -71,7 +71,7 @@ class Message
      */
     public function hasFileToUpload()
     {
-        return $this->messageData instanceof Image;
+        return $this->messageData instanceof Image && !$this->messageData->isRemoteFile();
     }
 
     /**
