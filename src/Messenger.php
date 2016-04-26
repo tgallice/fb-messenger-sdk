@@ -54,12 +54,9 @@ class Messenger
     public function sendMessage(Message $message)
     {
         $options = RequestOptionsFactory::create($message);
-        $decodedBody = $this->send('POST', '/me/messages', $options);
+        $responseData = $this->send('POST', '/me/messages', $options);
 
-        return new MessageResponse(
-            $decodedBody['recipient_id'],
-            $decodedBody['message_id']
-        );
+        return new MessageResponse($responseData['recipient_id'], $responseData['message_id']);
     }
 
     /**
@@ -82,9 +79,9 @@ class Messenger
             ]
         ];
 
-        $decodedBody = $this->send('GET', sprintf('/%s', $userId), $options);
+        $responseData = $this->send('GET', sprintf('/%s', $userId), $options);
 
-        return UserProfile::create($decodedBody);
+        return UserProfile::create($responseData);
     }
 
     /**
@@ -95,17 +92,8 @@ class Messenger
      */
     public function setWelcomeMessage($message, $pageId)
     {
-        $type = is_string($message) ? 'text' : 'attachment';
         $options = [
-            RequestOptions::JSON => [
-                'setting_type' => 'call_to_actions',
-                'thread_state' => 'new_thread',
-                'call_to_actions' => [
-                    [
-                        'message' => [$type => $message],
-                    ],
-                ],
-            ],
+            RequestOptions::JSON => $this->buildWelcomeData($message),
         ];
 
         return $this->send('POST', sprintf('/%s/thread_settings', $pageId), $options);
@@ -119,11 +107,7 @@ class Messenger
     public function deleteWelcomeMessage($pageId)
     {
         $options = [
-            RequestOptions::JSON => [
-                'setting_type' => 'call_to_actions',
-                'thread_state' => 'new_thread',
-                'call_to_actions' => [],
-            ],
+            RequestOptions::JSON => $this->buildWelcomeData(),
         ];
 
         return $this->send('POST', sprintf('/%s/thread_settings', $pageId), $options);
@@ -140,10 +124,8 @@ class Messenger
      */
     public function send($method, $uri, array $options = [])
     {
-        $options[RequestOptions::QUERY]['access_token'] = $this->token;
-
         try {
-            $this->lastResponse = $this->client->request($method, $uri, $options);
+            $response = $this->client->request($method, $uri, $this->buildOptions($options));
             // Catch all Guzzle\Request exceptions
         } catch (GuzzleException $e) {
             throw new ApiException($e->getMessage(), [
@@ -152,14 +134,30 @@ class Messenger
             ]);
         }
 
-        $decodedBody = $this->decodeResponseBody($this->lastResponse);
+        $this->lastResponse = $response;
 
-        if (isset($decodedBody['error'])) {
-            $message = isset($decodedBody['error']['message']) ? $decodedBody['error']['message'] : 'Unknown error';
-            throw new ApiException($message, $decodedBody['error']);
+        return $this->getResponseData($response);
+    }
+
+    /**
+     * Return the decoded body data
+     *
+     * @param ResponseInterface $response
+     *
+     * @return array
+     *
+     * @throws ApiException
+     */
+    private function getResponseData(ResponseInterface $response)
+    {
+        $responseData = $this->decodeResponseBody($response);
+
+        if (isset($responseData['error'])) {
+            $message = isset($responseData['error']['message']) ? $responseData['error']['message'] : 'Unknown error';
+            throw new ApiException($message, $responseData['error']);
         }
 
-        return $decodedBody;
+        return $responseData;
     }
 
     /**
@@ -170,5 +168,43 @@ class Messenger
     private function decodeResponseBody(ResponseInterface $response)
     {
         return json_decode((string) $response->getBody(), true);
+    }
+
+    /**
+     * @param array $options
+     *
+     * @return array
+     */
+    private function buildOptions(array $options = [])
+    {
+        $options[RequestOptions::QUERY]['access_token'] = $this->token;
+
+        return $options;
+    }
+
+    /**
+     * @param mixed $message
+     *
+     * @return array
+     */
+    private function buildWelcomeData($message = null)
+    {
+        $data = [
+            'setting_type' => 'call_to_actions',
+            'thread_state' => 'new_thread',
+            'call_to_actions' => [],
+        ];
+
+        if (null === $message) {
+            return $data;
+        }
+
+        $type = is_string($message) ? 'text' : 'attachment';
+
+        $data['call_to_actions'][] = [
+            'message' => [$type => $message],
+        ];
+
+        return $data;
     }
 }
