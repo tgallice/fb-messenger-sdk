@@ -27,7 +27,7 @@ class Element implements \JsonSerializable
     private $subtitle;
 
     /**
-     * @var array|Button[]
+     * @var null|Button[]
      */
     private $buttons;
 
@@ -36,27 +36,17 @@ class Element implements \JsonSerializable
      * @param null|string $itemUrl
      * @param null|string $imageUrl
      * @param null|string $subtitle
-     * @param Button[] $buttons
+     * @param null|Button[] $buttons
      */
-    public function __construct($title, $itemUrl = null, $imageUrl = null, $subtitle = null, array $buttons = [])
+    public function __construct($title, $itemUrl = null, $imageUrl = null, $subtitle = null, array $buttons = null)
     {
-        if (strlen($title) > 45) {
-            throw new \InvalidArgumentException('In a generic element, the "title" field should not exceed 45 characters');
-        }
-
-        if (!empty($subtitle) && strlen($subtitle) > 80) {
-            throw new \InvalidArgumentException('In a generic element, the "subtitle" field should not exceed 80 characters');
-        }
-
-        if (count($buttons) > 3) {
-            throw new \InvalidArgumentException('A generic element can not have more than 3 buttons');
-        }
-
         $this->title = $title;
         $this->itemUrl = $itemUrl;
         $this->imageUrl = $imageUrl;
         $this->subtitle = $subtitle;
         $this->buttons = $buttons;
+
+        $this->validateElement();
     }
 
     /**
@@ -92,7 +82,7 @@ class Element implements \JsonSerializable
     }
 
     /**
-     * @return array|Button[]
+     * @return null|Button[]
      */
     public function getButtons()
     {
@@ -111,5 +101,20 @@ class Element implements \JsonSerializable
             'subtitle' => $this->subtitle,
             'buttons' => $this->buttons,
         ];
+    }
+
+    private function validateElement()
+    {
+        if (strlen($this->title) > 45) {
+            throw new \InvalidArgumentException('In a generic element, the "title" field should not exceed 45 characters');
+        }
+
+        if (!empty($this->subtitle) && strlen($this->subtitle) > 80) {
+            throw new \InvalidArgumentException('In a generic element, the "subtitle" field should not exceed 80 characters');
+        }
+
+        if (count($this->buttons) > 3) {
+            throw new \InvalidArgumentException('A generic element can not have more than 3 buttons');
+        }
     }
 }
