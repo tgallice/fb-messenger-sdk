@@ -45,12 +45,11 @@ $response = $messenger->sendMessage($message);
 
 require_once __DIR__.'/vendor/autoload.php';
 
-use Tgallice\FBMessenger\Attachment\Structured;
+use Tgallice\FBMessenger\Attachment\Structured\Receipt;
 use Tgallice\FBMessenger\Messenger;
 use Tgallice\FBMessenger\Message\Message;
 use Tgallice\FBMessenger\Model\Receipt\Element;
 use Tgallice\FBMessenger\Model\Summary;
-use Tgallice\FBMessenger\Template\Receipt;
 
 $messenger = new Messenger('page_token');
 
@@ -61,8 +60,7 @@ $elements = [
 
 $summary = new Summary(<total_cost>);
 
-$receipt = new Receipt('My Receipt', '123456789', 'EUR', 'Visa', $elements, $summary);
-$attachment = new Structured($receipt);
+$attachment = new Receipt('My Receipt', '123456789', 'EUR', 'Visa', $elements, $summary);
 $message = new Message('<USER_ID>', $attachment);
 
 $response = $messenger->sendMessage($message);
@@ -75,10 +73,9 @@ $response = $messenger->sendMessage($message);
 
 require_once __DIR__.'/vendor/autoload.php';
 
-use Tgallice\FBMessenger\Attachment\Structured;
+use Tgallice\FBMessenger\Attachment\Structured\Button;
 use Tgallice\FBMessenger\Messenger;
 use Tgallice\FBMessenger\Message\Message;
-use Tgallice\FBMessenger\Template\Button as ButtonTemplate;
 use Tgallice\FBMessenger\Model\Button\WebUrl;
 use Tgallice\FBMessenger\Model\Button\Postback;
 
@@ -89,8 +86,7 @@ $elements = [
     new Postback('Button2', 'EVENT_NAME'),
 ];
 
-$template = new ButtonTemplate('My template', $elements);
-$attachment = new Structured($template);
+$attachment = new Button('My template', $elements);
 
 $message = new Message('<USER_ID>', $attachment);
 $response = $messenger->sendMessage($message);

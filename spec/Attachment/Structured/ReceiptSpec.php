@@ -1,13 +1,15 @@
 <?php
 
-namespace spec\Tgallice\FBMessenger\Template;
+namespace spec\Tgallice\FBMessenger\Attachment\Structured;
 
 use PhpSpec\ObjectBehavior;
+use Tgallice\FBMessenger\Attachment;
+use Tgallice\FBMessenger\Attachment\Structured;
+use Tgallice\FBMessenger\Attachment\Structured\Receipt;
 use Tgallice\FBMessenger\Model\Address;
 use Tgallice\FBMessenger\Model\Adjustment;
 use Tgallice\FBMessenger\Model\Receipt\Element;
 use Tgallice\FBMessenger\Model\Summary;
-use Tgallice\FBMessenger\Template;
 
 class ReceiptSpec extends ObjectBehavior
 {
@@ -18,17 +20,17 @@ class ReceiptSpec extends ObjectBehavior
 
     function it_is_initializable()
     {
-        $this->shouldHaveType('Tgallice\FBMessenger\Template\Receipt');
+        $this->shouldHaveType('Tgallice\FBMessenger\Attachment\Structured\Receipt');
     }
 
-    function it_is_a_template()
+    function it_is_a_structured_attachment()
     {
-        $this->shouldImplement(Template::class);
+        $this->shouldImplement(Structured::class);
     }
 
     function it_should_return_type()
     {
-        $this->getType()->shouldReturn(Template::TYPE_RECEIPT);
+        $this->getType()->shouldReturn(Attachment::TYPE_TEMPLATE);
     }
 
     function it_should_return_the_recipient_name()
@@ -106,12 +108,10 @@ class ReceiptSpec extends ObjectBehavior
         $this->getAdjustments()->shouldReturn([$adjustment]);
     }
 
-    function it_should_be_serializable($element, $summary, Address $address, Adjustment $adjustment)
+    function it_should_return_the_payload($element, $summary)
     {
-        $this->shouldImplement(\JsonSerializable::class);
-
-        $expected = [
-            'template_type' => Template::TYPE_RECEIPT,
+        $this->getPayload()->shouldReturn([
+            'template_type' => Receipt::TEMPLATE_TYPE,
             'recipient_name' => 'recipient',
             'order_number' => '1a2b',
             'currency' => 'currency',
@@ -122,12 +122,35 @@ class ReceiptSpec extends ObjectBehavior
             'address' => null,
             'summary' => $summary,
             'adjustments' => [],
+        ]);
+    }
+
+    function it_should_be_serializable($element, $summary, Address $address, Adjustment $adjustment)
+    {
+        $this->shouldImplement(\JsonSerializable::class);
+
+        $expected = [
+            'type' => Attachment::TYPE_TEMPLATE,
+            'payload' => [
+                'template_type' => Receipt::TEMPLATE_TYPE,
+                'recipient_name' => 'recipient',
+                'order_number' => '1a2b',
+                'currency' => 'currency',
+                'payment_method' => 'payment_method',
+                'timestamp' => null,
+                'order_url' => null,
+                'elements' => [$element],
+                'address' => null,
+                'summary' => $summary,
+                'adjustments' => [],
+            ],
         ];
 
         $this->jsonSerialize()->shouldBeLike($expected);
+
         $time = time();
 
-        $expected = array_merge($expected, [
+        $expected['payload'] = array_merge($expected['payload'], [
             'timestamp' => $time,
             'order_url' => 'http://order.com',
             'address' => $address,

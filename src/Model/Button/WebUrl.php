@@ -3,7 +3,6 @@
 namespace Tgallice\FBMessenger\Model\Button;
 
 use Tgallice\FBMessenger\Model\Button;
-use Tgallice\FBMessenger\Template;
 
 class WebUrl extends Button
 {

@@ -3,7 +3,7 @@
 namespace spec\Tgallice\FBMessenger\Model\Generic;
 
 use PhpSpec\ObjectBehavior;
-use Tgallice\FBMessenger\Template\Button;
+use Tgallice\FBMessenger\Model\Button;
 
 class ElementSpec extends ObjectBehavior
 {

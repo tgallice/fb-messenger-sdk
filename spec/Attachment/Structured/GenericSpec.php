@@ -1,10 +1,12 @@
 <?php
 
-namespace spec\Tgallice\FBMessenger\Template;
+namespace spec\Tgallice\FBMessenger\Attachment\Structured;
 
 use PhpSpec\ObjectBehavior;
+use Tgallice\FBMessenger\Attachment;
+use Tgallice\FBMessenger\Attachment\Structured;
+use Tgallice\FBMessenger\Attachment\Structured\Generic;
 use Tgallice\FBMessenger\Model\Generic\Element;
-use Tgallice\FBMessenger\Template;
 
 class GenericSpec extends ObjectBehavior
 {
@@ -15,17 +17,17 @@ class GenericSpec extends ObjectBehavior
 
     function it_is_initializable()
     {
-        $this->shouldHaveType('Tgallice\FBMessenger\Template\Generic');
+        $this->shouldHaveType('Tgallice\FBMessenger\Attachment\Structured\Generic');
     }
 
-    function it_is_a_template()
+    function it_is_a_structured_attachment()
     {
-        $this->shouldImplement(Template::class);
+        $this->shouldImplement(Structured::class);
     }
 
     function it_should_return_the_type()
     {
-        $this->getType()->shouldReturn(Template::TYPE_GENERIC);
+        $this->getType()->shouldReturn(Attachment::TYPE_TEMPLATE);
     }
 
     function it_should_return_the_elements($element)
@@ -33,13 +35,24 @@ class GenericSpec extends ObjectBehavior
         $this->getElements()->shouldReturn([$element]);
     }
 
+    function it_should_return_the_payload($element)
+    {
+        $this->getPayload()->shouldReturn([
+            'template_type' => Generic::TEMPLATE_TYPE,
+            'elements' => [$element],
+        ]);
+    }
+
     function it_should_be_serializable($element)
     {
         $this->shouldImplement(\JsonSerializable::class);
 
         $expected = [
-            'template_type' => Template::TYPE_GENERIC,
-            'elements' => [$element],
+            'type' => Attachment::TYPE_TEMPLATE,
+            'payload' => [
+                'template_type' => Generic::TEMPLATE_TYPE,
+                'elements' => [$element],
+            ],
         ];
 
         $this->jsonSerialize()->shouldBeLike($expected);
