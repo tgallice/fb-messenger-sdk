@@ -100,6 +100,18 @@ class Messenger
     }
 
     /**
+     * Subscribe the app to the page
+     *
+     * @return bool
+     */
+    public function subscribe()
+    {
+        $response = $this->send('POST', '/me/subscribed_apps');
+
+        return $response['success'];
+    }
+
+    /**
      * @param string $pageId
      *
      * @return array
