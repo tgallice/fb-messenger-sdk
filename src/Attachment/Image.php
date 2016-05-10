@@ -23,7 +23,6 @@ class Image extends Attachment
     public function __construct($filePath)
     {
         $this->path = $filePath;
-        $this->type = Attachment::TYPE_IMAGE;
 
         // Local image is sent with a multipart request
         $this->payload = [];
@@ -67,6 +66,14 @@ class Image extends Attachment
         }
 
         return $this->isRemoteFile = preg_match('/^(https?|ftp):\/\/.*/', $this->path) === 1;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getType()
+    {
+        return Attachment::TYPE_IMAGE;
     }
 
     private function validateFile()
