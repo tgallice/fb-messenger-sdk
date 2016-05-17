@@ -106,11 +106,6 @@ use Tgallice\FBMessenger\Messenger;
 
 $messenger = new Messenger('page_token');
 
-$elements = [
-    new WebUrl('Button1', 'http://google.com'),
-    new Postback('Button2', 'EVENT_NAME'),
-];
-
 // Local file
 $image = new Image('./image.jpg');
 $message = new Message('<USER_ID>', $image);
