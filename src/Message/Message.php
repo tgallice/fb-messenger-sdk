@@ -34,7 +34,7 @@ class Message
     {
         $this->recipient = $recipientId;
 
-        if (is_string($messageData) && strlen($messageData) > 320) {
+        if (is_string($messageData) && mb_strlen($messageData) > 320) {
             throw new \InvalidArgumentException('The text message should not exceed 320 characters');
         }
 

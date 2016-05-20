@@ -41,7 +41,7 @@ abstract class Button implements \JsonSerializable
      */
     protected function validateTitleSize($title)
     {
-        if (strlen($title) > 20) {
+        if (mb_strlen($title) > 20) {
             throw new \InvalidArgumentException('A call to action title field should not exceed 20 characters');
         }
     }

@@ -25,6 +25,7 @@
   },
   "require": {
     "php": ">=5.5.9",
+    "ext-mbstring": "*",
     "guzzlehttp/guzzle": "^6.2"
   },
   "require-dev": {
