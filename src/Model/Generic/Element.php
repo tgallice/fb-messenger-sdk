@@ -105,11 +105,11 @@ class Element implements \JsonSerializable
 
     private function validateElement()
     {
-        if (strlen($this->title) > 45) {
+        if (mb_strlen($this->title) > 45) {
             throw new \InvalidArgumentException('In a generic element, the "title" field should not exceed 45 characters');
         }
 
-        if (!empty($this->subtitle) && strlen($this->subtitle) > 80) {
+        if (!empty($this->subtitle) && mb_strlen($this->subtitle) > 80) {
             throw new \InvalidArgumentException('In a generic element, the "subtitle" field should not exceed 80 characters');
         }
 
