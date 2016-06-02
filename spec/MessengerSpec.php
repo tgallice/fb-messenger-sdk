@@ -200,4 +200,24 @@ class MessengerSpec extends ObjectBehavior
             ->shouldHaveKeyWithValue('result', 'Successfully removed all new_thread\'s CTAs');
 
     }
+
+    function it_subscribe_the_app($client, ResponseInterface $response)
+    {
+        $options = [
+            RequestOptions::QUERY => [
+                'access_token' => 'token',
+            ],
+        ];
+
+        $response->getBody()->willReturn('
+            {
+              "success": true
+            }
+        ');
+
+        $client->request('POST', '/me/subscribed_apps', $options)
+            ->willReturn($response);
+
+        $this->subscribe()->shouldReturn(true);
+    }
 }
