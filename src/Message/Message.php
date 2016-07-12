@@ -21,6 +21,11 @@ class Message
     private $messageData;
 
     /**
+     * @var array
+     */
+    private $quickReplies;
+    
+    /**
      * @var string
      */
     private $notificationType;
@@ -28,9 +33,10 @@ class Message
     /**
      * @param string $recipientId Recipient Id
      * @param string|Attachment $messageData
+     * @param array $quickReplies
      * @param string $notificationType
      */
-    public function __construct($recipientId, $messageData, $notificationType = NotificationType::REGULAR)
+    public function __construct($recipientId, $messageData, array $quickReplies = null, $notificationType = NotificationType::REGULAR)
     {
         $this->recipient = $recipientId;
 
@@ -38,7 +44,12 @@ class Message
             throw new \InvalidArgumentException('The text message should not exceed 320 characters');
         }
 
+        if(count($quickReplies) > 10) {
+        	throw new \InvalidArgumentException('The quick replies should not exceed 10 elements');
+        }
+        
         $this->messageData = $messageData;
+        $this->quickReplies = $quickReplies;
         $this->notificationType = $notificationType;
     }
 
@@ -56,6 +67,14 @@ class Message
     public function getMessageData()
     {
         return $this->messageData;
+    }
+    
+    /**
+     * @return array
+     */
+    public function getQuickReplies()
+    {
+    	return $this->quickReplies;
     }
 
     /**
@@ -82,8 +101,8 @@ class Message
     public function format()
     {
         $messageType = is_string($this->messageData) ? 'text' : 'attachment';
-
-        return [
+        
+		$return = [
             'recipient' => [
                 $this::$recipient_value_type => $this->recipient,
             ],
@@ -92,5 +111,11 @@ class Message
             ],
             'notification_type' => $this->notificationType,
         ];
+		
+		if($messageType === 'text' && count($this->quickReplies) > 0) {
+			$return['quick_replies'] = $this->quickReplies;
+		}
+		
+		return $return;
     }
 }

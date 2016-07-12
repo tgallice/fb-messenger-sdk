@@ -12,10 +12,11 @@ class PhoneMessage extends Message
     /**
      * @param string $phoneNumber
      * @param string|Attachment $messageData
+     * @param array $quickReplies
      * @param string $notificationType
      */
-    public function __construct($phoneNumber, $messageData, $notificationType = NotificationType::REGULAR)
+    public function __construct($phoneNumber, $messageData, array $quickReplies = null, $notificationType = NotificationType::REGULAR)
     {
-        parent::__construct($phoneNumber, $messageData, $notificationType);
+        parent::__construct($phoneNumber, $messageData, $quickReplies, $notificationType);
     }
 }
