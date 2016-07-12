@@ -7,6 +7,8 @@ abstract class Button implements \JsonSerializable
     const TYPE_POSTBACK = 'postback';
 
     const TYPE_WEB_URL = 'web_url';
+    
+    const TYPE_ACCOUNT_LINK = 'account_link';
 
     /**
      * @var string
