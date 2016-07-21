@@ -1,14 +1,14 @@
 <?php
 
-namespace Tgallice\FBMessenger\Attachment\Structured;
+namespace Tgallice\FBMessenger\Attachment\Template;
 
-use Tgallice\FBMessenger\Attachment\Structured;
+use Tgallice\FBMessenger\Attachment\Template;
 use Tgallice\FBMessenger\Model\Address;
 use Tgallice\FBMessenger\Model\Adjustment;
 use Tgallice\FBMessenger\Model\Receipt\Element;
 use Tgallice\FBMessenger\Model\Summary;
 
-class Receipt extends Structured
+class Receipt extends Template
 {
     const TEMPLATE_TYPE = 'receipt';
 

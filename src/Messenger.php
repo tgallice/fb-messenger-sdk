@@ -7,7 +7,7 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;
-use Tgallice\FBMessenger\Attachment\Structured;
+use Tgallice\FBMessenger\Attachment\Template;
 use Tgallice\FBMessenger\Exception\ApiException;
 use Tgallice\FBMessenger\Message\Message;
 use Tgallice\FBMessenger\Model\MessageResponse;
@@ -85,7 +85,7 @@ class Messenger
     }
 
     /**
-     * @param string|Structured $message
+     * @param string|Template $message
      * @param string $pageId
      *
      * @return array

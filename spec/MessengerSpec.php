@@ -9,7 +9,7 @@ use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Psr\Http\Message\ResponseInterface;
 use Tgallice\FBMessenger\Attachment;
-use Tgallice\FBMessenger\Attachment\Structured;
+use Tgallice\FBMessenger\Attachment\Template;
 use Tgallice\FBMessenger\Exception\ApiException;
 use Tgallice\FBMessenger\Message\Message;
 use Tgallice\FBMessenger\Model\MessageResponse;
@@ -142,7 +142,7 @@ class MessengerSpec extends ObjectBehavior
             ->shouldHaveKeyWithValue('result', 'Successfully added new_thread\'s CTAs');
     }
 
-    function it_can_set_structured_welcome_message($client, Structured $structured, ResponseInterface $response)
+    function it_can_set_welcome_message($client, Template $template, ResponseInterface $response)
     {
         $options = [
             RequestOptions::QUERY => [
@@ -153,7 +153,7 @@ class MessengerSpec extends ObjectBehavior
                 'thread_state' => 'new_thread',
                 'call_to_actions' => [
                     [
-                        'message' => ['attachment' => $structured],
+                        'message' => ['attachment' => $template],
 
                     ],
                 ],
@@ -169,7 +169,7 @@ class MessengerSpec extends ObjectBehavior
         $client->request('POST', '/my_page_id/thread_settings', $options)
             ->willReturn($response);
 
-        $this->setWelcomeMessage($structured, 'my_page_id')
+        $this->setWelcomeMessage($template, 'my_page_id')
             ->shouldHaveKeyWithValue('result', 'Successfully added new_thread\'s CTAs');
 
     }

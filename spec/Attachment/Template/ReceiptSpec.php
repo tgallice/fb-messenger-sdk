@@ -1,11 +1,11 @@
 <?php
 
-namespace spec\Tgallice\FBMessenger\Attachment\Structured;
+namespace spec\Tgallice\FBMessenger\Attachment\Template;
 
 use PhpSpec\ObjectBehavior;
 use Tgallice\FBMessenger\Attachment;
-use Tgallice\FBMessenger\Attachment\Structured;
-use Tgallice\FBMessenger\Attachment\Structured\Receipt;
+use Tgallice\FBMessenger\Attachment\Template;
+use Tgallice\FBMessenger\Attachment\Template\Receipt;
 use Tgallice\FBMessenger\Model\Address;
 use Tgallice\FBMessenger\Model\Adjustment;
 use Tgallice\FBMessenger\Model\Receipt\Element;
@@ -20,12 +20,12 @@ class ReceiptSpec extends ObjectBehavior
 
     function it_is_initializable()
     {
-        $this->shouldHaveType('Tgallice\FBMessenger\Attachment\Structured\Receipt');
+        $this->shouldHaveType('Tgallice\FBMessenger\Attachment\Template\Receipt');
     }
 
-    function it_is_a_structured_attachment()
+    function it_is_a_template()
     {
-        $this->shouldImplement(Structured::class);
+        $this->shouldImplement(Template::class);
     }
 
     function it_should_return_type()

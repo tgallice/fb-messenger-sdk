@@ -1,11 +1,11 @@
 <?php
 
-namespace spec\Tgallice\FBMessenger\Attachment\Structured;
+namespace spec\Tgallice\FBMessenger\Attachment\Template;
 
 use PhpSpec\ObjectBehavior;
 use Tgallice\FBMessenger\Attachment;
-use Tgallice\FBMessenger\Attachment\Structured;
-use Tgallice\FBMessenger\Attachment\Structured\Button;
+use Tgallice\FBMessenger\Attachment\Template;
+use Tgallice\FBMessenger\Attachment\Template\Button;
 use Tgallice\FBMessenger\Model\Button as ButtonModel;
 
 class ButtonSpec extends ObjectBehavior
@@ -17,12 +17,12 @@ class ButtonSpec extends ObjectBehavior
 
     function it_is_initializable()
     {
-        $this->shouldHaveType('Tgallice\FBMessenger\Attachment\Structured\Button');
+        $this->shouldHaveType('Tgallice\FBMessenger\Attachment\Template\Button');
     }
 
-    function it_is_a_structured_attachment()
+    function it_is_a_template()
     {
-        $this->shouldImplement(Structured::class);
+        $this->shouldImplement(Template::class);
     }
 
     function it_should_return_the_type()

@@ -1,11 +1,11 @@
 <?php
 
-namespace spec\Tgallice\FBMessenger\Attachment\Structured;
+namespace spec\Tgallice\FBMessenger\Attachment\Template;
 
 use PhpSpec\ObjectBehavior;
 use Tgallice\FBMessenger\Attachment;
-use Tgallice\FBMessenger\Attachment\Structured;
-use Tgallice\FBMessenger\Attachment\Structured\Generic;
+use Tgallice\FBMessenger\Attachment\Template;
+use Tgallice\FBMessenger\Attachment\Template\Generic;
 use Tgallice\FBMessenger\Model\Generic\Element;
 
 class GenericSpec extends ObjectBehavior
@@ -17,12 +17,12 @@ class GenericSpec extends ObjectBehavior
 
     function it_is_initializable()
     {
-        $this->shouldHaveType('Tgallice\FBMessenger\Attachment\Structured\Generic');
+        $this->shouldHaveType('Tgallice\FBMessenger\Attachment\Template\Generic');
     }
 
-    function it_is_a_structured_attachment()
+    function it_is_a_template()
     {
-        $this->shouldImplement(Structured::class);
+        $this->shouldImplement(Template::class);
     }
 
     function it_should_return_the_type()

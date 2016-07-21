@@ -1,11 +1,11 @@
 <?php
 
-namespace Tgallice\FBMessenger\Attachment\Structured;
+namespace Tgallice\FBMessenger\Attachment\Template;
 
-use Tgallice\FBMessenger\Attachment\Structured;
+use Tgallice\FBMessenger\Attachment\Template;
 use Tgallice\FBMessenger\Model\Button as ButtonModel;
 
-class Button extends Structured
+class Button extends Template
 {
     const TEMPLATE_TYPE = 'button';
 

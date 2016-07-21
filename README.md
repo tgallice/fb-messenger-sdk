@@ -45,7 +45,7 @@ $response = $messenger->sendMessage($message);
 
 require_once __DIR__.'/vendor/autoload.php';
 
-use Tgallice\FBMessenger\Attachment\Structured\Receipt;
+use Tgallice\FBMessenger\Attachment\Template\Receipt;
 use Tgallice\FBMessenger\Messenger;
 use Tgallice\FBMessenger\Message\Message;
 use Tgallice\FBMessenger\Model\Receipt\Element;
@@ -73,7 +73,7 @@ $response = $messenger->sendMessage($message);
 
 require_once __DIR__.'/vendor/autoload.php';
 
-use Tgallice\FBMessenger\Attachment\Structured\Button;
+use Tgallice\FBMessenger\Attachment\Template\Button;
 use Tgallice\FBMessenger\Messenger;
 use Tgallice\FBMessenger\Message\Message;
 use Tgallice\FBMessenger\Model\Button\WebUrl;

@@ -4,7 +4,7 @@ namespace Tgallice\FBMessenger\Attachment;
 
 use Tgallice\FBMessenger\Attachment;
 
-abstract class Structured extends Attachment
+abstract class Template extends Attachment
 {
     /**
      * @inheritdoc
