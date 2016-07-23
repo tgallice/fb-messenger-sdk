@@ -5,13 +5,14 @@ namespace spec\Tgallice\FBMessenger\Message;
 use PhpSpec\ObjectBehavior;
 use Tgallice\FBMessenger\Attachment;
 use Tgallice\FBMessenger\Attachment\Image;
+use Tgallice\FBMessenger\Model\QuickReply;
 use Tgallice\FBMessenger\NotificationType;
 
 class MessageSpec extends ObjectBehavior
 {
-    function let()
+    function let(QuickReply $quickReply)
     {
-        $this->beConstructedWith('user_id', 'text', NotificationType::REGULAR);
+        $this->beConstructedWith('user_id', 'text', [$quickReply], NotificationType::REGULAR);
     }
 
     function it_is_initializable()
@@ -27,6 +28,33 @@ class MessageSpec extends ObjectBehavior
     function it_should_return_the_message()
     {
         $this->getMessageData()->shouldReturn('text');
+    }
+
+    function it_should_be_constructed_with_a_quick_reply($quickReply)
+    {
+        $this->beConstructedWith('user_id', 'text', $quickReply);
+
+        $this->getQuickReplies()->shouldReturn([$quickReply]);
+    }
+
+    function it_should_return_the_quick_replies($quickReply)
+    {
+        $this->getQuickReplies()->shouldReturn([$quickReply]);
+    }
+
+    function it_throw_an_exception_if_wrong_quick_replies_value()
+    {
+        $this->beConstructedWith('user_id', 'text', 'quick_reply');
+        $this->shouldThrow(new \InvalidArgumentException('$quickReplies must be an array of QuickReply, a QuickReply or a null value.'))
+            ->duringInstantiation();
+    }
+
+    function it_throw_an_exception_if_quick_replies_limit_exceeded($quickReply)
+    {
+        $quickReplies = array_pad([], 11, $quickReply);
+        $this->beConstructedWith('user_id', 'text', $quickReplies);
+        $this->shouldThrow(new \InvalidArgumentException('A message can not have more than 10 quick replies.'))
+            ->duringInstantiation();
     }
 
     function it_should_check_if_has_file_to_upload()
@@ -54,7 +82,7 @@ class MessageSpec extends ObjectBehavior
         $this->shouldThrow($exception)->duringInstantiation();
     }
 
-    function it_should_return_a_formatted_message_text()
+    function it_should_return_a_formatted_message_text($quickReply)
     {
         $expected = [
             'recipient' => [
@@ -62,6 +90,7 @@ class MessageSpec extends ObjectBehavior
             ],
             'message' => [
                 'text' => 'text',
+                'quick_replies' => [$quickReply],
             ],
             'notification_type' => NotificationType::REGULAR,
         ];
@@ -69,7 +98,7 @@ class MessageSpec extends ObjectBehavior
         $this->format()->shouldBeLike($expected);
     }
 
-    function it_should_return_a_formatted_message_with_attachment(Attachment $attachment)
+    function it_should_return_a_formatted_message_with_attachment(Attachment $attachment, $quickReply)
     {
         $expected = [
             'recipient' => [
@@ -77,11 +106,12 @@ class MessageSpec extends ObjectBehavior
             ],
             'message' => [
                 'attachment' => $attachment,
+                'quick_replies' => [$quickReply],
             ],
             'notification_type' => NotificationType::REGULAR,
         ];
 
-        $this->beConstructedWith('user_id', $attachment);
+        $this->beConstructedWith('user_id', $attachment, $quickReply);
         $this->format()->shouldBeLike($expected);
     }
 }

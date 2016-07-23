@@ -3,6 +3,7 @@
 namespace Tgallice\FBMessenger\Message;
 
 use Tgallice\FBMessenger\Attachment;
+use Tgallice\FBMessenger\Model\QuickReply;
 use Tgallice\FBMessenger\NotificationType;
 
 class PhoneMessage extends Message
@@ -12,10 +13,11 @@ class PhoneMessage extends Message
     /**
      * @param string $phoneNumber
      * @param string|Attachment $messageData
+     * @param null|QuickReply|QuickReply[] $quickReplies
      * @param string $notificationType
      */
-    public function __construct($phoneNumber, $messageData, $notificationType = NotificationType::REGULAR)
+    public function __construct($phoneNumber, $messageData, $quickReplies = null, $notificationType = NotificationType::REGULAR)
     {
-        parent::__construct($phoneNumber, $messageData, $notificationType);
+        parent::__construct($phoneNumber, $messageData, $quickReplies, $notificationType);
     }
 }

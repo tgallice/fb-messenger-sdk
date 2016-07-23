@@ -4,6 +4,7 @@ namespace Tgallice\FBMessenger\Message;
 
 use Tgallice\FBMessenger\Attachment;
 use Tgallice\FBMessenger\Attachment\Image;
+use Tgallice\FBMessenger\Model\QuickReply;
 use Tgallice\FBMessenger\NotificationType;
 
 class Message
@@ -21,6 +22,11 @@ class Message
     private $messageData;
 
     /**
+     * @var null|QuickReply[]
+     */
+    private $quickReplies;
+
+    /**
      * @var string
      */
     private $notificationType;
@@ -28,9 +34,10 @@ class Message
     /**
      * @param string $recipientId Recipient Id
      * @param string|Attachment $messageData
+     * @param null|QuickReply|QuickReply[] $quickReplies
      * @param string $notificationType
      */
-    public function __construct($recipientId, $messageData, $notificationType = NotificationType::REGULAR)
+    public function __construct($recipientId, $messageData, $quickReplies = null, $notificationType = NotificationType::REGULAR)
     {
         $this->recipient = $recipientId;
 
@@ -38,7 +45,12 @@ class Message
             throw new \InvalidArgumentException('The text message should not exceed 320 characters');
         }
 
+        if (!is_string($messageData) && !$messageData instanceOf Attachment) {
+            throw new \InvalidArgumentException('The message date must be a string or an Attachment.');
+        }
+
         $this->messageData = $messageData;
+        $this->quickReplies = $this->initializeQuickReplies($quickReplies);
         $this->notificationType = $notificationType;
     }
 
@@ -56,6 +68,15 @@ class Message
     public function getMessageData()
     {
         return $this->messageData;
+    }
+
+
+    /**
+     * @return null|QuickReply[]
+     */
+    public function getQuickReplies()
+    {
+        return $this->quickReplies;
     }
 
     /**
@@ -89,8 +110,27 @@ class Message
             ],
             'message' => [
                 $messageType => $this->messageData,
+                'quick_replies' => $this->quickReplies,
             ],
             'notification_type' => $this->notificationType,
         ];
+    }
+
+    /**
+     * @param null|QuickReply|QuickReply[] $quickReplies
+     *
+     * @return null|QuickReply[]
+     */
+    private function initializeQuickReplies($quickReplies = null)
+    {
+        if ($quickReplies instanceof QuickReply) {
+            $quickReplies = [$quickReplies];
+        } elseif ($quickReplies !== null && !is_array($quickReplies)) {
+            throw new \InvalidArgumentException('$quickReplies must be an array of QuickReply, a QuickReply or a null value.');
+        } elseif (count($quickReplies) > 10) {
+            throw new \InvalidArgumentException('A message can not have more than 10 quick replies.');
+        }
+
+        return $quickReplies;
     }
 }
