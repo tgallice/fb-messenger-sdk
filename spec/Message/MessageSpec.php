@@ -12,7 +12,7 @@ class MessageSpec extends ObjectBehavior
 {
     function let(QuickReply $quickReply)
     {
-        $this->beConstructedWith('user_id', 'text', [$quickReply], NotificationType::REGULAR);
+        $this->beConstructedWith('user_id', 'text', [$quickReply], 'metadata', NotificationType::REGULAR);
     }
 
     function it_is_initializable()
@@ -57,6 +57,11 @@ class MessageSpec extends ObjectBehavior
             ->duringInstantiation();
     }
 
+    function it_should_return_the_metadata()
+    {
+        $this->getMetadata()->shouldReturn('metadata');
+    }
+
     function it_should_check_if_has_file_to_upload()
     {
         $this->hasFileToUpload()->shouldReturn(false);
@@ -91,6 +96,7 @@ class MessageSpec extends ObjectBehavior
             'message' => [
                 'text' => 'text',
                 'quick_replies' => [$quickReply],
+                'metadata' => 'metadata',
             ],
             'notification_type' => NotificationType::REGULAR,
         ];
@@ -107,11 +113,12 @@ class MessageSpec extends ObjectBehavior
             'message' => [
                 'attachment' => $attachment,
                 'quick_replies' => [$quickReply],
+                'metadata' => 'metadata',
             ],
             'notification_type' => NotificationType::REGULAR,
         ];
 
-        $this->beConstructedWith('user_id', $attachment, $quickReply);
+        $this->beConstructedWith('user_id', $attachment, $quickReply, 'metadata');
         $this->format()->shouldBeLike($expected);
     }
 }

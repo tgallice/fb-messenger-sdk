@@ -27,6 +27,11 @@ class Message
     private $quickReplies;
 
     /**
+     * @var null|string
+     */
+    private $metadata;
+
+    /**
      * @var string
      */
     private $notificationType;
@@ -35,9 +40,10 @@ class Message
      * @param string $recipientId Recipient Id
      * @param string|Attachment $messageData
      * @param null|QuickReply|QuickReply[] $quickReplies
+     * @param null|string $metadata
      * @param string $notificationType
      */
-    public function __construct($recipientId, $messageData, $quickReplies = null, $notificationType = NotificationType::REGULAR)
+    public function __construct($recipientId, $messageData, $quickReplies = null, $metadata = null, $notificationType = NotificationType::REGULAR)
     {
         $this->recipient = $recipientId;
 
@@ -49,8 +55,13 @@ class Message
             throw new \InvalidArgumentException('The message date must be a string or an Attachment.');
         }
 
+        if ($metadata !== null && mb_strlen($metadata) > 1000) {
+            throw new \InvalidArgumentException('$metadata should not exceed 1000 characters.');
+        }
+
         $this->messageData = $messageData;
         $this->quickReplies = $this->initializeQuickReplies($quickReplies);
+        $this->metadata = $metadata;
         $this->notificationType = $notificationType;
     }
 
@@ -77,6 +88,14 @@ class Message
     public function getQuickReplies()
     {
         return $this->quickReplies;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getMetadata()
+    {
+        return $this->metadata;
     }
 
     /**
@@ -111,6 +130,7 @@ class Message
             'message' => [
                 $messageType => $this->messageData,
                 'quick_replies' => $this->quickReplies,
+                'metadata' => $this->metadata,
             ],
             'notification_type' => $this->notificationType,
         ];

@@ -11,12 +11,12 @@ class PhoneMessageSpec extends ObjectBehavior
 {
     function let(QuickReply $quickReply)
     {
-        $this->beConstructedWith('0102030405', 'text', $quickReply, NotificationType::REGULAR);
+        $this->beConstructedWith('0102030405', 'text', $quickReply, 'metadata', NotificationType::REGULAR);
     }
 
     function it_is_initializable()
     {
-        $this->shouldHaveType('Tgallice\FBMessenger\PhoneMessage');
+        $this->shouldHaveType('Tgallice\FBMessenger\Message\PhoneMessage');
     }
 
     function it_is_a_message()
@@ -38,6 +38,7 @@ class PhoneMessageSpec extends ObjectBehavior
             'message' => [
                 'text' => 'text',
                 'quick_replies' => [$quickReply],
+                'metadata' => 'metadata',
             ],
             'notification_type' => NotificationType::REGULAR,
         ];
@@ -55,11 +56,12 @@ class PhoneMessageSpec extends ObjectBehavior
             'message' => [
                 'attachment' => $attachment,
                 'quick_replies' => [$quickReply],
+                'metadata' => 'metadata',
             ],
             'notification_type' => NotificationType::REGULAR,
         ];
 
-        $this->beConstructedWith('0102030405', $attachment, $quickReply);
+        $this->beConstructedWith('0102030405', $attachment, $quickReply, 'metadata');
         $this->format()->shouldBeLike($expected);
     }
 }
