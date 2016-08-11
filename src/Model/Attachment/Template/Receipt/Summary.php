@@ -1,6 +1,6 @@
 <?php
 
-namespace Tgallice\FBMessenger\Model;
+namespace Tgallice\FBMessenger\Model\Attachment\Template\Receipt;
 
 class Summary implements \JsonSerializable
 {

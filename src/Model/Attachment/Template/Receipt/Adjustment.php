@@ -1,6 +1,6 @@
 <?php
 
-namespace Tgallice\FBMessenger\Model;
+namespace Tgallice\FBMessenger\Model\Attachment\Template\Receipt;
 
 class Adjustment implements \JsonSerializable
 {
@@ -20,7 +20,6 @@ class Adjustment implements \JsonSerializable
      */
     public function __construct($name = null, $amount = null)
     {
-        // TODO: write logic here
         $this->name = $name;
         $this->amount = $amount;
     }

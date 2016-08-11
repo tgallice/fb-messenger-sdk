@@ -1,6 +1,6 @@
 <?php
 
-namespace spec\Tgallice\FBMessenger\Model;
+namespace spec\Tgallice\FBMessenger\Model\Attachment\Template\Receipt;
 
 use PhpSpec\ObjectBehavior;
 
@@ -13,7 +13,7 @@ class SummarySpec extends ObjectBehavior
 
     function it_is_initializable()
     {
-        $this->shouldHaveType('Tgallice\FBMessenger\Model\Summary');
+        $this->shouldHaveType('Tgallice\FBMessenger\Model\Attachment\Template\Receipt\Summary');
     }
 
     function it_should_return_the_total_cost()

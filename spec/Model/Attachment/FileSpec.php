@@ -1,11 +1,12 @@
 <?php
 
-namespace spec\Tgallice\FBMessenger\Attachment;
+namespace spec\Tgallice\FBMessenger\Model\Attachment;
 
 use PhpSpec\ObjectBehavior;
-use Tgallice\FBMessenger\Attachment;
+use Prophecy\Argument;
+use Tgallice\FBMessenger\Model\Attachment;
 
-class ImageSpec extends ObjectBehavior
+class FileSpec extends ObjectBehavior
 {
     private $_filename;
 
@@ -22,39 +23,26 @@ class ImageSpec extends ObjectBehavior
 
     function it_is_initializable()
     {
-        $this->shouldHaveType('Tgallice\FBMessenger\Attachment\Image');
+        $this->shouldHaveType('Tgallice\FBMessenger\Model\Attachment\File');
     }
 
     function it_is_a_attachment()
     {
-        $this->shouldImplement('Tgallice\FBMessenger\Attachment');
+        $this->shouldImplement('Tgallice\FBMessenger\Model\Attachment');
     }
 
-    function it_should_return_the_type()
+    function it_has_a_file_type()
     {
-        $this->getType()->shouldReturn(Attachment::TYPE_IMAGE);
+        $this->getType()->shouldReturn(Attachment::TYPE_FILE);
     }
 
-    function it_should_return_the_file_path()
+    function it_has_a_path()
     {
         $this->getPath()->shouldReturn($this->_filename);
     }
 
-    function it_should_return_a_empty_payload()
+    function it_can_check_if_its_a_remote_file()
     {
-        $this->getPayload()->shouldReturn([]);
-    }
-
-    function it_should_return_if_its_a_remote_file()
-    {
-        $this->isRemoteFile()->shouldReturn(false);
-    }
-
-    function it_allow_jpg_local_file()
-    {
-        $this->generateFile('.jpg');
-
-        $this->beConstructedWith($this->_filename);
         $this->isRemoteFile()->shouldReturn(false);
     }
 
@@ -74,18 +62,6 @@ class ImageSpec extends ObjectBehavior
             ->duringOpen();
     }
 
-    function it_throws_exception_when_the_file_is_not_a_png_or_a_jpg()
-    {
-        $this->generateFile('.ext');
-
-        $this->beConstructedWith($this->_filename);
-        $exception = new \InvalidArgumentException(
-            sprintf('"%s" this file has not an allowed extension. Only "png" and "jpg" image are supported', $this->_filename)
-        );
-
-        $this->shouldThrow($exception)->duringInstantiation();
-    }
-
     function it_throws_exception_when_the_local_file_is_not_readable()
     {
         $this->generateFile('.jpg', false);
@@ -95,12 +71,13 @@ class ImageSpec extends ObjectBehavior
         );
 
         $this->beConstructedWith($this->_filename);
-        $this->shouldThrow($exception)->duringInstantiation();
+        $this->shouldThrow($exception)->duringOpen();
     }
 
     function it_should_open_file_as_stream()
     {
-        $this->open()->shouldBeResource();
+        $this->open();
+        $this->getStream()->shouldBeResource();
     }
 
     function generateFile($ext, $readable = true)
@@ -113,17 +90,5 @@ class ImageSpec extends ObjectBehavior
         }
 
         $this->_filename = $filename;
-    }
-
-    function it_should_be_serializable()
-    {
-        $this->shouldImplement(\JsonSerializable::class);
-
-        $expected = [
-            'type' => Attachment::TYPE_IMAGE,
-            'payload' => [],
-        ];
-
-        $this->jsonSerialize()->shouldBeLike($expected);
     }
 }

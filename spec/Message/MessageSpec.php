@@ -51,7 +51,7 @@ class MessageSpec extends ObjectBehavior
 
     function it_throw_an_exception_if_quick_replies_limit_exceeded($quickReply)
     {
-        $quickReplies = array_pad([], 11, $quickReply);
+        $quickReplies = array_fill(0, 11, $quickReply);
         $this->beConstructedWith('user_id', 'text', $quickReplies);
         $this->shouldThrow(new \InvalidArgumentException('A message can not have more than 10 quick replies.'))
             ->duringInstantiation();

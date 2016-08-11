@@ -1,15 +1,14 @@
 <?php
 
-namespace spec\Tgallice\FBMessenger\Attachment\Template;
+namespace spec\Tgallice\FBMessenger\Model\Attachment\Template;
 
 use PhpSpec\ObjectBehavior;
-use Tgallice\FBMessenger\Attachment;
-use Tgallice\FBMessenger\Attachment\Template;
-use Tgallice\FBMessenger\Attachment\Template\Receipt;
+use Prophecy\Argument;
 use Tgallice\FBMessenger\Model\Address;
-use Tgallice\FBMessenger\Model\Adjustment;
-use Tgallice\FBMessenger\Model\Receipt\Element;
-use Tgallice\FBMessenger\Model\Summary;
+use Tgallice\FBMessenger\Model\Attachment\Template;
+use Tgallice\FBMessenger\Model\Attachment\Template\Receipt\Element;
+use Tgallice\FBMessenger\Model\Attachment\Template\Receipt\Summary;
+use Tgallice\FBMessenger\Model\Attachment\Template\Receipt\Adjustment;
 
 class ReceiptSpec extends ObjectBehavior
 {
@@ -20,7 +19,7 @@ class ReceiptSpec extends ObjectBehavior
 
     function it_is_initializable()
     {
-        $this->shouldHaveType('Tgallice\FBMessenger\Attachment\Template\Receipt');
+        $this->shouldHaveType('Tgallice\FBMessenger\Model\Attachment\Template\Receipt');
     }
 
     function it_is_a_template()
@@ -28,40 +27,42 @@ class ReceiptSpec extends ObjectBehavior
         $this->shouldImplement(Template::class);
     }
 
-    function it_should_return_type()
+    function it_has_a_type()
     {
-        $this->getType()->shouldReturn(Attachment::TYPE_TEMPLATE);
+        $this->getType()->shouldReturn(Template::TYPE_RECEIPT);
     }
 
-    function it_should_return_the_recipient_name()
+    function it_has_a_recipient_name()
     {
         $this->getRecipientName()->shouldReturn('recipient');
     }
 
-    function it_should_return_the_order_number()
+    function it_has_a_order_number()
     {
         $this->getOrderNumber()->shouldReturn('1a2b');
     }
 
-    function it_should_return_the_currency()
+    function it_has_a_currency()
     {
         $this->getCurrency()->shouldReturn('currency');
     }
 
-    function it_should_return_the_elements($element)
+    function it_has_elements($element)
     {
         $this->getElements()->shouldReturn([$element]);
     }
 
-    function it_should_return_the_summary($summary)
+    function it_has_a_summary($summary)
     {
         $this->getSummary()->shouldReturn($summary);
     }
 
-    function it_should_return_the_payment_method()
+    function it_has_a_payment_method()
     {
         $this->getPaymentMethod()->shouldReturn('payment_method');
     }
+
+    // Optionnal
 
     function it_has_not_default_timestamp()
     {
@@ -99,7 +100,7 @@ class ReceiptSpec extends ObjectBehavior
 
     function it_has_not_default_adjustments()
     {
-        $this->getAdjustments()->shouldReturn([]);
+        $this->getAdjustments()->shouldReturn(null);
     }
 
     function its_adjustments_are_mutable(Adjustment $adjustment)
@@ -108,10 +109,12 @@ class ReceiptSpec extends ObjectBehavior
         $this->getAdjustments()->shouldReturn([$adjustment]);
     }
 
-    function it_should_return_the_payload($element, $summary)
+    function it_should_be_serializable($element, $summary, Address $address, Adjustment $adjustment)
     {
-        $this->getPayload()->shouldReturn([
-            'template_type' => Receipt::TEMPLATE_TYPE,
+        $this->shouldImplement(\JsonSerializable::class);
+
+        $expected = [
+            'template_type' => Template::TYPE_RECEIPT,
             'recipient_name' => 'recipient',
             'order_number' => '1a2b',
             'currency' => 'currency',
@@ -122,35 +125,13 @@ class ReceiptSpec extends ObjectBehavior
             'address' => null,
             'summary' => $summary,
             'adjustments' => [],
-        ]);
-    }
-
-    function it_should_be_serializable($element, $summary, Address $address, Adjustment $adjustment)
-    {
-        $this->shouldImplement(\JsonSerializable::class);
-
-        $expected = [
-            'type' => Attachment::TYPE_TEMPLATE,
-            'payload' => [
-                'template_type' => Receipt::TEMPLATE_TYPE,
-                'recipient_name' => 'recipient',
-                'order_number' => '1a2b',
-                'currency' => 'currency',
-                'payment_method' => 'payment_method',
-                'timestamp' => null,
-                'order_url' => null,
-                'elements' => [$element],
-                'address' => null,
-                'summary' => $summary,
-                'adjustments' => [],
-            ],
         ];
 
         $this->jsonSerialize()->shouldBeLike($expected);
 
         $time = time();
 
-        $expected['payload'] = array_merge($expected['payload'], [
+        $expected = array_merge($expected, [
             'timestamp' => $time,
             'order_url' => 'http://order.com',
             'address' => $address,

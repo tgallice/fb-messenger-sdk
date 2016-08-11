@@ -1,6 +1,6 @@
 <?php
 
-namespace spec\Tgallice\FBMessenger\Model\Receipt;
+namespace spec\Tgallice\FBMessenger\Model\Attachment\Template\Receipt;
 
 use PhpSpec\ObjectBehavior;
 
@@ -13,10 +13,10 @@ class ElementSpec extends ObjectBehavior
 
     function it_is_initializable()
     {
-        $this->shouldHaveType('Tgallice\FBMessenger\Model\Receipt\Element');
+        $this->shouldHaveType('Tgallice\FBMessenger\Model\Attachment\Template\Receipt\Element');
     }
 
-    function it_should_return_the_title()
+    function it_has_a_title()
     {
         $this->getTitle()->shouldReturn('title');
     }

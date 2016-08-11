@@ -50,4 +50,17 @@ class QuickReplySpec extends ObjectBehavior
             ->shouldThrow(new \InvalidArgumentException('$title should not exceed 20 characters.'))
             ->duringInstantiation();
     }
+
+    function it_should_be_serializable()
+    {
+        $this->shouldImplement(\JsonSerializable::class);
+
+        $expected = [
+            'title' => 'title',
+            'payload' => 'PAYLOAD',
+            'content_type' => 'text',
+        ];
+
+        $this->jsonSerialize()->shouldBeLike($expected);
+    }
 }

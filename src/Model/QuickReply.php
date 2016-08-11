@@ -2,7 +2,7 @@
 
 namespace Tgallice\FBMessenger\Model;
 
-class QuickReply
+class QuickReply implements \JsonSerializable
 {
     /**
      * @var string
@@ -58,5 +58,17 @@ class QuickReply
     public function getPayload()
     {
         return $this->payload;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'title' => $this->title,
+            'payload' => $this->payload,
+            'content_type' => $this->contentType,
+        ];
     }
 }
