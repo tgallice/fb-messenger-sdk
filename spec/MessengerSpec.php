@@ -2,12 +2,12 @@
 
 namespace spec\Tgallice\FBMessenger;
 
-use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\RequestOptions;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Psr\Http\Message\ResponseInterface;
+use Tgallice\FBMessenger\Client;
 use Tgallice\FBMessenger\Exception\ApiException;
 use Tgallice\FBMessenger\Model\Message;
 use Tgallice\FBMessenger\Model\MessageResponse;
@@ -16,9 +16,9 @@ use Tgallice\FBMessenger\NotificationType;
 
 class MessengerSpec extends ObjectBehavior
 {
-    function let(ClientInterface $client)
+    function let(Client $client)
     {
-        $this->beConstructedWith('token', $client);
+        $this->beConstructedWith($client);
     }
 
     function it_is_initializable()
@@ -36,10 +36,9 @@ class MessengerSpec extends ObjectBehavior
             }
         ');
 
-        $client->request('GET', '/user_id', [
+        $client->send('GET', '/user_id', [
             RequestOptions::QUERY => [
                 'fields' => 'first_name,last_name,profile_pic',
-                'access_token' => 'token'
             ],
         ])->willReturn($response);
 
@@ -53,13 +52,12 @@ class MessengerSpec extends ObjectBehavior
     {
         $message->hasFileToUpload()->willReturn(false);
 
-        $client->request('POST', '/me/messages', [
+        $client->send('POST', '/me/messages', null, [], [], [
             RequestOptions::JSON => [
                 'recipient' => ['id' =>'1008372609250235'],
                 'message' => $message,
                 'notification_type' => NotificationType::REGULAR,
-            ],
-            RequestOptions::QUERY => ['access_token' => 'token'],
+            ]
         ])->willReturn($response);
 
         $response->getBody()->willReturn('
@@ -86,7 +84,7 @@ class MessengerSpec extends ObjectBehavior
             }
         }');
 
-        $client->request('POST', '/uri', Argument::any())->willReturn($response);
+        $client->send('POST', '/uri', Argument::any())->willReturn($response);
 
         $error = json_decode('
             {
@@ -104,7 +102,7 @@ class MessengerSpec extends ObjectBehavior
     function it_catch_exception_from_client_($client)
     {
         $exception = new TransferException('Exception client');
-        $client->request('POST', '/uri', Argument::any())->willThrow($exception);
+        $client->send('POST', '/uri', Argument::any())->willThrow($exception);
 
         $this->shouldThrow(new ApiException('Exception client', [
             'code' => $exception->getCode(),
@@ -115,9 +113,6 @@ class MessengerSpec extends ObjectBehavior
     function it_can_set_text_welcome_message($client, ResponseInterface $response)
     {
         $options = [
-            RequestOptions::QUERY => [
-                'access_token' => 'token',
-            ],
             RequestOptions::JSON => [
                 'setting_type' => 'call_to_actions',
                 'thread_state' => 'new_thread',
@@ -135,7 +130,7 @@ class MessengerSpec extends ObjectBehavior
             }
         ');
 
-        $client->request('POST', '/my_page_id/thread_settings', $options)
+        $client->send('POST', '/my_page_id/thread_settings', $options)
             ->willReturn($response);
 
         $this->setWelcomeMessage('Welcome', 'my_page_id')
@@ -145,9 +140,6 @@ class MessengerSpec extends ObjectBehavior
     function it_can_set_welcome_message($client, Template $template, ResponseInterface $response)
     {
         $options = [
-            RequestOptions::QUERY => [
-                'access_token' => 'token',
-            ],
             RequestOptions::JSON => [
                 'setting_type' => 'call_to_actions',
                 'thread_state' => 'new_thread',
@@ -166,7 +158,7 @@ class MessengerSpec extends ObjectBehavior
             }
         ');
 
-        $client->request('POST', '/my_page_id/thread_settings', $options)
+        $client->send('POST', '/my_page_id/thread_settings', $options)
             ->willReturn($response);
 
         $this->setWelcomeMessage($template, 'my_page_id')
@@ -177,9 +169,6 @@ class MessengerSpec extends ObjectBehavior
     function it_can_delete_welcome_message($client, ResponseInterface $response)
     {
         $options = [
-            RequestOptions::QUERY => [
-                'access_token' => 'token',
-            ],
             RequestOptions::JSON => [
                 'setting_type' => 'call_to_actions',
                 'thread_state' => 'new_thread',
@@ -193,7 +182,7 @@ class MessengerSpec extends ObjectBehavior
             }
         ');
 
-        $client->request('POST', '/my_page_id/thread_settings', $options)
+        $client->send('POST', '/my_page_id/thread_settings', $options)
             ->willReturn($response);
 
         $this->deleteWelcomeMessage('my_page_id')
@@ -203,19 +192,13 @@ class MessengerSpec extends ObjectBehavior
 
     function it_subscribe_the_app($client, ResponseInterface $response)
     {
-        $options = [
-            RequestOptions::QUERY => [
-                'access_token' => 'token',
-            ],
-        ];
-
         $response->getBody()->willReturn('
             {
               "success": true
             }
         ');
 
-        $client->request('POST', '/me/subscribed_apps', $options)
+        $client->post('/me/subscribed_apps')
             ->willReturn($response);
 
         $this->subscribe()->shouldReturn(true);

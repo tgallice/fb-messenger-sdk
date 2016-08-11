@@ -112,7 +112,7 @@ class Message implements \JsonSerializable
     }
 
     /**
-     * Check if the message contain file
+     * Check if the message contains file
      *
      * @return bool
      */

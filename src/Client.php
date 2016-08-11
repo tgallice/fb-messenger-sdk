@@ -3,7 +3,10 @@
 namespace Tgallice\FBMessenger;
 
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;
+use Tgallice\FBMessenger\Exception\ApiException;
 
 class Client
 {
@@ -33,11 +36,6 @@ class Client
     private $accessToken;
 
     /**
-     * @var string
-     */
-    private $apiVersion;
-
-    /**
      * @var ClientInterface client
      */
     private $client;
@@ -47,22 +45,21 @@ class Client
      */
     private $lastResponse;
 
-    public function __construct($accessToken, ClientInterface $httpClient = null, $apiVersion = self::DEFAULT_API_VERSION)
+    public function __construct($accessToken, ClientInterface $httpClient = null)
     {
         $this->accessToken = $accessToken;
-        $this->apiVersion = $apiVersion;
         $this->client = $httpClient ?: $this->defaultHttpClient();
     }
 
     /**
      * @param string $uri
-     * @param array $params
+     * @param mixed $body
      *
      * @return ResponseInterface
      */
-    public function post($uri, array $params = [])
+    public function post($uri, $body)
     {
-        return $this->send('POST', $uri, $params);
+        return $this->send('POST', $uri, $body);
     }
 
     /**
@@ -89,12 +86,13 @@ class Client
 
     /**
      * @param string $uri
+     * @param array $options
      *
      * @return ResponseInterface
      */
-    public function delete($uri)
+    public function delete($uri, array $options = [])
     {
-        return $this->send('DELETE', $uri);
+        return $this->send('DELETE', $uri, null, [], [], $options);
     }
 
     /**
@@ -106,14 +104,23 @@ class Client
      * @param array $options
      *
      * @return ResponseInterface
+     *
+     * @throws ApiException
      */
     public function send($method, $uri, $body = null, array $query = [], array $headers = [], array $options = [])
     {
-        $headers = array_merge($this->getDefaultHeaders(), $headers);
-
         $query = $this->addToken($query);
 
-        $this->lastResponse = $this->client->send($method, $uri, $body, $query, $headers, $options);
+        try {
+            $options[RequestOptions::BODY] = $body;
+            $options[RequestOptions::QUERY] = $query;
+            $options[RequestOptions::HEADERS] = array_merge($this->defaultHeaders(), $headers);
+
+            $this->lastResponse = $this->client->request($method, $uri, $options);
+        } catch (GuzzleException $e) {
+            throw new ApiException($e->getMessage(), $e->getTrace());
+        }
+
         $this->validateResponse($this->lastResponse);
 
         return $this->lastResponse;
@@ -136,7 +143,7 @@ class Client
 
     private function addToken(array $query)
     {
-        $query['acccess_token'] = $this->accessToken;
+        $query['access_token'] = $this->accessToken;
 
         return $query;
     }
@@ -144,14 +151,15 @@ class Client
     /**
      * @param ResponseInterface $response
      *
-     * @throws BadResponseException
+     * @throws ApiException
      */
     private function validateResponse(ResponseInterface $response)
     {
         if ($response->getStatusCode() !== 200) {
             $message = empty($response->getReasonPhrase()) ? 'Bad response status code' : $response->getReasonPhrase();
+            $responseData = json_decode((string) $response->getBody(), true);
 
-            throw new BadResponseException($message, $response);
+            throw new ApiException($message, $responseData);
         }
     }
 
@@ -161,9 +169,16 @@ class Client
     private function defaultHttpClient()
     {
         return new \GuzzleHttp\Client([
-            'base_uri' => self::API_BASE_URI . $this->apiVersion,
+            'base_uri' => self::API_BASE_URI . self::DEFAULT_API_VERSION,
             'timeout' => self::DEFAULT_TIMEOUT,
             'connect_timeout' => self::DEFAULT_TIMEOUT,
         ]);
+    }
+
+    private function defaultHeaders()
+    {
+        return [
+            'Content-Type' => 'application/json',
+        ];
     }
 }

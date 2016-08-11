@@ -4,18 +4,21 @@ namespace Tgallice\FBMessenger\Exception;
 
 class ApiException extends \RuntimeException
 {
-    /**
-     * @var array
-     */
     private $errorData;
 
-    public function __construct($message, array $errorData = [])
+    /**
+     * ApiException constructor.
+     *
+     * @param string $message
+     * @param mixed $errorData
+     */
+    public function __construct($message, $errorData)
     {
         $this->message = $message;
         $this->errorData = $errorData;
 
-        if (isset($errorData['code'])) {
-            $this->code = $errorData['code'];
+        if (isset($this->errorData['error']['code'])) {
+            $this->code = $this->errorData['error']['code'];
         }
     }
 
