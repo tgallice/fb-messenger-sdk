@@ -2,7 +2,7 @@
 
 namespace Tgallice\FBMessenger\Model;
 
-use Tgallice\FBMessenger\Attachment;
+use Tgallice\FBMessenger\Model\Attachment\File;
 
 class Message implements \JsonSerializable
 {
@@ -109,6 +109,34 @@ class Message implements \JsonSerializable
         }
 
         $this->metadata = empty($metadata) ? null : $metadata;
+    }
+
+    /**
+     * Check if the message contain file
+     *
+     * @return bool
+     */
+    public function hasFileToUpload()
+    {
+        if (!$this->data instanceof File) {
+            return false;
+        }
+
+        return !$this->data->isRemoteFile();
+    }
+
+    /**
+     * Return a stream of the local file attachment
+     *
+     * @return resource|null
+     */
+    public function getFileStream()
+    {
+        if (!$this->data instanceof File) {
+            return null;
+        }
+
+        return $this->data->getStream();
     }
 
     /**

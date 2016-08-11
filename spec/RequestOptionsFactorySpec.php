@@ -4,10 +4,7 @@ namespace spec\Tgallice\FBMessenger;
 
 use GuzzleHttp\RequestOptions;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Prophet;
-use Tgallice\FBMessenger\Attachment;
-use Tgallice\FBMessenger\Attachment\Image;
-use Tgallice\FBMessenger\Message\Message;
+use Tgallice\FBMessenger\Model\Message;
 
 class RequestOptionsFactorySpec extends ObjectBehavior
 {
@@ -16,29 +13,21 @@ class RequestOptionsFactorySpec extends ObjectBehavior
         $this->shouldHaveType('Tgallice\FBMessenger\RequestOptionsFactory');
     }
 
-    function it_should_create_a_multipart_option_for_image_attachment(Message $message, Image $image)
+    function it_should_create_a_multipart_option_for_file_attachment(Message $message)
     {
-        $formatted = [
-            'recipient' => ['recipient' => 'data'],
-            'message' => ['message' => 'data'],
-            'notification_type' => 'notif',
-        ];
-
-        $image->open()->willReturn('open_resource');
-
         $message->hasFileToUpload()->willReturn(true);
-        $message->getMessageData()->willReturn($image);
-        $message->format()->willReturn($formatted);
+        $message->getFileStream()->willReturn('stream');
+        $message->jsonSerialize()->willReturn(['data' => 'value']);
 
-        $this::create($message)->shouldReturn([
+        $this::createForMessage('rid', $message, 'notif')->shouldReturn([
             RequestOptions::MULTIPART => [
                 [
                     'name' => 'recipient',
-                    'contents' => json_encode($formatted['recipient']),
+                    'contents' => json_encode(['id' => 'rid']),
                 ],
                 [
                     'name' => 'message',
-                    'contents' => json_encode($formatted['message']),
+                    'contents' => json_encode(['data' => 'value']),
                 ],
                 [
                     'name' => 'notification_type',
@@ -46,25 +35,34 @@ class RequestOptionsFactorySpec extends ObjectBehavior
                 ],
                 [
                     'name' => 'filedata',
-                    'contents' => 'open_resource',
+                    'contents' => 'stream',
                 ]
             ]
         ]);
     }
 
-    function it_should_create_body_option_attachment(Message $message)
+    function it_should_a_json_option_for_message(Message $message)
     {
-        $formatted = [
-            'recipient' => [],
-            'message' => [],
-            'notification_type' => '',
-        ];
-
         $message->hasFileToUpload()->willReturn(false);
-        $message->format()->willReturn($formatted);
 
-        $this::create($message)->shouldReturn([
-            RequestOptions::JSON => $formatted,
+        $this::createForMessage('rid', $message, 'notif')->shouldReturn([
+            RequestOptions::JSON => [
+                'recipient' => ['id' => 'rid'],
+                'message' => $message,
+                'notification_type' => 'notif'
+            ]
         ]);
+    }
+
+    function it_should_handle_recipient_id()
+    {
+        $this::createRecipientField('rid')
+            ->shouldReturn(['id' => 'rid']);
+    }
+
+    function it_should_handle_phone_number()
+    {
+        $this::createRecipientField('+1(212)555-2368')
+            ->shouldReturn(['phone_number' => '+1(212)555-2368']);
     }
 }

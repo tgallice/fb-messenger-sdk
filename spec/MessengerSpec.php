@@ -8,12 +8,11 @@ use GuzzleHttp\RequestOptions;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Psr\Http\Message\ResponseInterface;
-use Tgallice\FBMessenger\Attachment;
-use Tgallice\FBMessenger\Attachment\Template;
 use Tgallice\FBMessenger\Exception\ApiException;
-use Tgallice\FBMessenger\Message\Message;
+use Tgallice\FBMessenger\Model\Message;
 use Tgallice\FBMessenger\Model\MessageResponse;
 use Tgallice\FBMessenger\Model\UserProfile;
+use Tgallice\FBMessenger\NotificationType;
 
 class MessengerSpec extends ObjectBehavior
 {
@@ -53,12 +52,13 @@ class MessengerSpec extends ObjectBehavior
     function it_send_message_to_user($client, Message $message, ResponseInterface $response)
     {
         $message->hasFileToUpload()->willReturn(false);
-        $message->format()->willReturn([
-            'data' => 'value',
-        ]);
 
         $client->request('POST', '/me/messages', [
-            RequestOptions::JSON => ['data' => 'value'],
+            RequestOptions::JSON => [
+                'recipient' => ['id' =>'1008372609250235'],
+                'message' => $message,
+                'notification_type' => NotificationType::REGULAR,
+            ],
             RequestOptions::QUERY => ['access_token' => 'token'],
         ])->willReturn($response);
 
@@ -69,7 +69,7 @@ class MessengerSpec extends ObjectBehavior
             }
         ');
 
-        $this->sendMessage($message)->shouldBeLike(
+        $this->sendMessage('1008372609250235', $message)->shouldBeLike(
             new MessageResponse('1008372609250235', 'mid.1456970487936:c34767dfe57ee6e339')
         );
     }

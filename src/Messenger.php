@@ -7,9 +7,8 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;
-use Tgallice\FBMessenger\Attachment\Template;
 use Tgallice\FBMessenger\Exception\ApiException;
-use Tgallice\FBMessenger\Message\Message;
+use Tgallice\FBMessenger\Model\Message;
 use Tgallice\FBMessenger\Model\MessageResponse;
 use Tgallice\FBMessenger\Model\UserProfile;
 
@@ -45,15 +44,17 @@ class Messenger
     }
 
     /**
+     * @param string $recipient
      * @param Message $message
+     * @param string $notificationType
      *
      * @return MessageResponse
      *
      * @throws ApiException
      */
-    public function sendMessage(Message $message)
+    public function sendMessage($recipient, Message $message, $notificationType = NotificationType::REGULAR)
     {
-        $options = RequestOptionsFactory::create($message);
+        $options = RequestOptionsFactory::createForMessage($recipient, $message, $notificationType);
         $responseData = $this->send('POST', '/me/messages', $options);
 
         return new MessageResponse($responseData['recipient_id'], $responseData['message_id']);

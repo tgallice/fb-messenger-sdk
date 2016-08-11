@@ -3,7 +3,8 @@
 namespace spec\Tgallice\FBMessenger\Model;
 
 use PhpSpec\ObjectBehavior;
-use Tgallice\FBMessenger\Attachment;
+use Tgallice\FBMessenger\Model\Attachment;
+use Tgallice\FBMessenger\Model\Attachment\File;
 use Tgallice\FBMessenger\Model\Message;
 use Tgallice\FBMessenger\Model\QuickReply;
 
@@ -41,6 +42,7 @@ class MessageSpec extends ObjectBehavior
     function it_has_a_data()
     {
         $this->getData()->shouldReturn('message');
+        $this->hasFileToUpload()->shouldReturn(false);
     }
 
     function it_has_no_default_quick_replies()
@@ -94,6 +96,22 @@ class MessageSpec extends ObjectBehavior
     {
         $exception = new \InvalidArgumentException('$metadata should not exceed 1000 characters.');
         $this->shouldThrow($exception)->duringSetMetadata(str_repeat('text', 1001));
+    }
+
+    function it_can_check_if_message_contain_file_to_upload(File $file)
+    {
+        $file->isRemoteFile()->willReturn(false);
+
+        $this->beConstructedWith($file);
+        $this->hasFileToUpload()->shouldReturn(true);
+    }
+
+    function it_can_get_the_file_stream(File $file)
+    {
+        $file->getStream()->willReturn('stream');
+
+        $this->beConstructedWith($file);
+        $this->getFileStream()->shouldReturn('stream');
     }
 
     function it_must_be_json_serializable(QuickReply $quickReply)

@@ -59,6 +59,10 @@ class File extends Attachment
 
     public function open()
     {
+        if ($this->stream) {
+            return;
+        }
+
         if ($this->isRemoteFile()) {
             throw new \RuntimeException('A remote file can not be open');
         }
@@ -79,6 +83,8 @@ class File extends Attachment
      */
     public function getStream()
     {
+        $this->open();
+
         return $this->stream;
     }
 
