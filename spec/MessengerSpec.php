@@ -11,6 +11,10 @@ use Tgallice\FBMessenger\Client;
 use Tgallice\FBMessenger\Exception\ApiException;
 use Tgallice\FBMessenger\Model\Message;
 use Tgallice\FBMessenger\Model\MessageResponse;
+use Tgallice\FBMessenger\Model\ThreadSetting;
+use Tgallice\FBMessenger\Model\ThreadSetting\MenuItem;
+use Tgallice\FBMessenger\Model\ThreadSetting\Postback;
+use Tgallice\FBMessenger\Model\ThreadSetting\WebUrl;
 use Tgallice\FBMessenger\Model\UserProfile;
 use Tgallice\FBMessenger\NotificationType;
 
@@ -110,86 +114,6 @@ class MessengerSpec extends ObjectBehavior
         ]))->duringSend('POST', '/uri');
     }
 
-    function it_can_set_text_welcome_message($client, ResponseInterface $response)
-    {
-        $options = [
-            RequestOptions::JSON => [
-                'setting_type' => 'call_to_actions',
-                'thread_state' => 'new_thread',
-                'call_to_actions' => [
-                    [
-                        'message' => ['text' => 'Welcome'],
-                    ],
-                ],
-            ],
-        ];
-
-        $response->getBody()->willReturn('
-            {
-                "result": "Successfully added new_thread\'s CTAs"
-            }
-        ');
-
-        $client->send('POST', '/my_page_id/thread_settings', $options)
-            ->willReturn($response);
-
-        $this->setWelcomeMessage('Welcome', 'my_page_id')
-            ->shouldHaveKeyWithValue('result', 'Successfully added new_thread\'s CTAs');
-    }
-
-    function it_can_set_welcome_message($client, Template $template, ResponseInterface $response)
-    {
-        $options = [
-            RequestOptions::JSON => [
-                'setting_type' => 'call_to_actions',
-                'thread_state' => 'new_thread',
-                'call_to_actions' => [
-                    [
-                        'message' => ['attachment' => $template],
-
-                    ],
-                ],
-            ],
-        ];
-
-        $response->getBody()->willReturn('
-            {
-                "result": "Successfully added new_thread\'s CTAs"
-            }
-        ');
-
-        $client->send('POST', '/my_page_id/thread_settings', $options)
-            ->willReturn($response);
-
-        $this->setWelcomeMessage($template, 'my_page_id')
-            ->shouldHaveKeyWithValue('result', 'Successfully added new_thread\'s CTAs');
-
-    }
-
-    function it_can_delete_welcome_message($client, ResponseInterface $response)
-    {
-        $options = [
-            RequestOptions::JSON => [
-                'setting_type' => 'call_to_actions',
-                'thread_state' => 'new_thread',
-                'call_to_actions' => [],
-            ],
-        ];
-
-        $response->getBody()->willReturn('
-            {
-                "result": "Successfully removed all new_thread\'s CTAs"
-            }
-        ');
-
-        $client->send('POST', '/my_page_id/thread_settings', $options)
-            ->willReturn($response);
-
-        $this->deleteWelcomeMessage('my_page_id')
-            ->shouldHaveKeyWithValue('result', 'Successfully removed all new_thread\'s CTAs');
-
-    }
-
     function it_subscribe_the_app($client, ResponseInterface $response)
     {
         $response->getBody()->willReturn('
@@ -202,5 +126,100 @@ class MessengerSpec extends ObjectBehavior
             ->willReturn($response);
 
         $this->subscribe()->shouldReturn(true);
+    }
+
+    // Thread settings
+    function it_should_define_greeting_text($client)
+    {
+        $body = [
+            'setting_type' => 'greeting',
+            'greeting' => [
+                'text' => 'my text',
+            ],
+        ];
+
+        $client->post('/me/thread_settings', json_encode($body))->shouldBeCalled();
+
+        $this->setGreetingText('my text');
+    }
+
+    function it_should_define_get_started_button($client)
+    {
+        $body = [
+            'setting_type' => 'call_to_actions',
+            'thread_state' => 'new_thread',
+            'call_to_actions' => [
+                ['payload' => 'my_payload']
+            ],
+        ];
+
+        $client->post('/me/thread_settings', json_encode($body))->shouldBeCalled();
+
+        $this->setStartedButton('my_payload');
+    }
+
+    function it_should_delete_started_button($client)
+    {
+        $body = [
+            'setting_type' => 'call_to_actions',
+            'thread_state' => 'new_thread',
+        ];
+
+        $client->send('DELETE', '/me/thread_settings', json_encode($body))->shouldBeCalled();
+
+        $this->deleteStartedButton();
+    }
+
+    function it_should_define_persistent_menu($client)
+    {
+        $body = [
+            'setting_type' => 'call_to_actions',
+            'thread_state' => 'existing_thread',
+            'call_to_actions' => [
+                [
+                    'type' => 'postback',
+                    'title' => 'Help',
+                    'payload' => 'DEVELOPER_DEFINED_PAYLOAD_FOR_HELP',
+                ],
+                [
+                    'type' => 'postback',
+                    'title' => 'Start a New Order',
+                    'payload' => 'DEVELOPER_DEFINED_PAYLOAD_FOR_START_ORDER',
+                ],
+                [
+                    'type' => 'web_url',
+                    'title' => 'View Website',
+                    'url' => 'http://petersapparel.parseapp.com/',
+                ],
+            ]
+        ];
+
+        $client->post('/me/thread_settings', json_encode($body))->shouldBeCalled();
+
+        $this->setPersistentMenu([
+            new Postback('Help', 'DEVELOPER_DEFINED_PAYLOAD_FOR_HELP'),
+            new Postback('Start a New Order', 'DEVELOPER_DEFINED_PAYLOAD_FOR_START_ORDER'),
+            new WebUrl('View Website', 'http://petersapparel.parseapp.com/'),
+        ]);
+    }
+
+    function it_should_not_add_more_than_5_menu_item(MenuItem $menuItem)
+    {
+        $exception = new \InvalidArgumentException('You should not set more than 5 menu items.');
+        $this->shouldThrow($exception)->duringSetPersistentMenu([
+            $menuItem, $menuItem, $menuItem, $menuItem, $menuItem, $menuItem
+        ]);
+    }
+
+    function it_should_delete_persistent_menu($client)
+    {
+        $body = [
+            'setting_type' => 'call_to_actions',
+            'thread_state' => 'existing_thread',
+        ];
+
+        $client->send('DELETE', '/me/thread_settings', json_encode($body))->shouldBeCalled();
+
+        $this->deletePersistentMenu();
     }
 }

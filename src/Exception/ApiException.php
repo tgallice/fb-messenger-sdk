@@ -4,26 +4,26 @@ namespace Tgallice\FBMessenger\Exception;
 
 class ApiException extends \RuntimeException
 {
-    private $errorData;
+    private $apiError;
 
     /**
      * ApiException constructor.
      *
      * @param string $message
-     * @param mixed $errorData
+     * @param int $code
+     * @param mixed $apiError
      */
-    public function __construct($message, $errorData)
+    public function __construct($message = '', $code = 0, $apiError = null)
     {
-        $this->message = $message;
-        $this->errorData = $errorData;
-
-        if (isset($this->errorData['error']['code'])) {
-            $this->code = $this->errorData['error']['code'];
-        }
+        parent::__construct($message, $code);
+        $this->apiError = $apiError;
     }
 
-    public function getErrorData()
+    /**
+     * @return mixed|null
+     */
+    public function getApiError()
     {
-        return $this->errorData;
+        return $this->apiError;
     }
 }

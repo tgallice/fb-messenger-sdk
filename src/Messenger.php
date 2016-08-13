@@ -3,10 +3,13 @@
 namespace Tgallice\FBMessenger;
 
 use GuzzleHttp\RequestOptions;
-use Psr\Http\Message\ResponseInterface;
 use Tgallice\FBMessenger\Exception\ApiException;
 use Tgallice\FBMessenger\Model\Message;
 use Tgallice\FBMessenger\Model\MessageResponse;
+use Tgallice\FBMessenger\Model\ThreadSetting;
+use Tgallice\FBMessenger\Model\ThreadSetting\GreetingText;
+use Tgallice\FBMessenger\Model\ThreadSetting\StartedButton;
+use Tgallice\FBMessenger\Model\ThreadSetting\MenuItem;
 use Tgallice\FBMessenger\Model\UserProfile;
 
 class Messenger
@@ -71,21 +74,6 @@ class Messenger
     }
 
     /**
-     * @param string|Template $message
-     * @param string $pageId
-     *
-     * @return array
-     */
-    public function setWelcomeMessage($message, $pageId)
-    {
-        $options = [
-            RequestOptions::JSON => $this->buildWelcomeData($message),
-        ];
-
-        return $this->send('POST', sprintf('/%s/thread_settings', $pageId), $options);
-    }
-
-    /**
      * Subscribe the app to the page
      *
      * @return bool
@@ -99,42 +87,106 @@ class Messenger
     }
 
     /**
-     * @param string $pageId
-     *
-     * @return array
+     * @param $text
      */
-    public function deleteWelcomeMessage($pageId)
+    public function setGreetingText($text)
     {
-        $options = [
-            RequestOptions::JSON => $this->buildWelcomeData(),
-        ];
+        $greeting = new GreetingText($text);
+        $setting = $this->buildSetting(ThreadSetting::TYPE_GREETING, null, $greeting);
 
-        return $this->send('POST', sprintf('/%s/thread_settings', $pageId), $options);
+        $this->postThreadSettings($setting);
     }
 
     /**
-     * @param mixed $message
+     * @param string $payload
+     */
+    public function setStartedButton($payload)
+    {
+        $startedButton = new StartedButton($payload);
+        $setting = $this->buildSetting(
+            ThreadSetting::TYPE_CALL_TO_ACTIONS,
+            ThreadSetting::NEW_THREAD,
+            [$startedButton]
+        );
+
+        $this->postThreadSettings($setting);
+    }
+
+    public function deleteStartedButton()
+    {
+        $setting = $this->buildSetting(
+            ThreadSetting::TYPE_CALL_TO_ACTIONS,
+            ThreadSetting::NEW_THREAD
+        );
+
+        $this->deleteThreadSettings($setting);
+    }
+
+    /**
+     * @param MenuItem[] $menuItems
+     */
+    public function setPersistentMenu(array $menuItems)
+    {
+        if (count($menuItems) > 5) {
+            throw new \InvalidArgumentException('You should not set more than 5 menu items.');
+        }
+
+        $setting = $this->buildSetting(
+            ThreadSetting::TYPE_CALL_TO_ACTIONS,
+            ThreadSetting::EXISTING_THREAD,
+            $menuItems
+        );
+
+        $this->postThreadSettings($setting);
+    }
+
+    public function deletePersistentMenu()
+    {
+        $setting = $this->buildSetting(
+            ThreadSetting::TYPE_CALL_TO_ACTIONS,
+            ThreadSetting::EXISTING_THREAD
+        );
+
+        $this->deleteThreadSettings($setting);
+    }
+
+    /**
+     * @param array $setting
+     */
+    private function postThreadSettings(array $setting)
+    {
+        $this->client->post('/me/thread_settings', json_encode($setting));
+    }
+
+    /**
+     * @param array $setting
+     */
+    private function deleteThreadSettings(array $setting)
+    {
+        $this->client->send('DELETE', '/me/thread_settings', json_encode($setting));
+    }
+
+    /**
+     * @param string $type
+     * @param null|string $threadState
+     * @param array $value
      *
      * @return array
      */
-    private function buildWelcomeData($message = null)
+    private function buildSetting($type, $threadState = null, array $value = [])
     {
-        $data = [
-            'setting_type' => 'call_to_actions',
-            'thread_state' => 'new_thread',
-            'call_to_actions' => [],
+        $setting = [
+            'setting_type' => $type,
         ];
 
-        if (null === $message) {
-            return $data;
+        if ($threadState) {
+            $setting['thread_state'] = $threadState;
         }
 
-        $type = is_string($message) ? 'text' : 'attachment';
+        if (!empty($value)) {
+            $setting[$type] = $value;
+        }
 
-        $data['call_to_actions'][] = [
-            'message' => [$type => $message],
-        ];
-
-        return $data;
+        return $setting;
     }
 }

@@ -8,8 +8,7 @@ class ApiExceptionSpec extends ObjectBehavior
 {
     function let()
     {
-        $this->beConstructedWith('error', [
-            'code' => 100,
+        $this->beConstructedWith('error', 100, [
             'data' => 'value',
         ]);
     }
@@ -31,8 +30,7 @@ class ApiExceptionSpec extends ObjectBehavior
 
     function it_should_return_the_error_data()
     {
-        $this->getErrorData()->shouldReturn([
-            'code' => 100,
+        $this->getApiError()->shouldReturn([
             'data' => 'value',
         ]);
     }

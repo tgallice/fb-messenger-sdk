@@ -53,11 +53,11 @@ class Client
 
     /**
      * @param string $uri
-     * @param mixed $body
+     * @param string|null $body
      *
      * @return ResponseInterface
      */
-    public function post($uri, $body)
+    public function post($uri, $body = null)
     {
         return $this->send('POST', $uri, $body);
     }
@@ -75,13 +75,13 @@ class Client
 
     /**
      * @param string $uri
-     * @param array $params
+     * @param null|string $data
      *
      * @return ResponseInterface
      */
-    public function put($uri, array $params = [])
+    public function put($uri, $data = null)
     {
-        return $this->send('PUT', $uri, $params);
+        return $this->send('PUT', $uri, $data);
     }
 
     /**
@@ -90,9 +90,9 @@ class Client
      *
      * @return ResponseInterface
      */
-    public function delete($uri, array $options = [])
+    public function delete($uri)
     {
-        return $this->send('DELETE', $uri, null, [], [], $options);
+        return $this->send('DELETE', $uri);
     }
 
     /**
@@ -118,7 +118,7 @@ class Client
 
             $this->lastResponse = $this->client->request($method, $uri, $options);
         } catch (GuzzleException $e) {
-            throw new ApiException($e->getMessage(), $e->getTrace());
+            throw new ApiException($e->getMessage(), $e->getCode());
         }
 
         $this->validateResponse($this->lastResponse);
@@ -156,10 +156,11 @@ class Client
     private function validateResponse(ResponseInterface $response)
     {
         if ($response->getStatusCode() !== 200) {
-            $message = empty($response->getReasonPhrase()) ? 'Bad response status code' : $response->getReasonPhrase();
             $responseData = json_decode((string) $response->getBody(), true);
+            $code = isset($responseData['error']['code']) ? $responseData['error']['code'] : 0;
+            $message = isset($responseData['error']['message']) ? $responseData['error']['message'] : $response->getReasonPhrase();
 
-            throw new ApiException($message, $responseData);
+            throw new ApiException($message, $code, $responseData);
         }
     }
 

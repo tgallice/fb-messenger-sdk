@@ -3,6 +3,7 @@
 namespace spec\Tgallice\FBMessenger;
 
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\TransferException;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Psr\Http\Message\ResponseInterface;
@@ -41,8 +42,8 @@ class ClientSpec extends ObjectBehavior
 
     function it_has_shortcut_delete_request($httpClient, $response)
     {
-        $httpClient->request('DELETE', '/uri', Argument::withEntry('options', 'value'))->willReturn($response);
-        $this->delete('/uri', ['options' => 'value'])->shouldReturn($response);
+        $httpClient->request('DELETE', '/uri', Argument::withEntry('query', ['access_token' => 'token']))->willReturn($response);
+        $this->delete('/uri')->shouldReturn($response);
     }
 
     function it_should_send_request($httpClient, $response)
@@ -88,14 +89,36 @@ class ClientSpec extends ObjectBehavior
         $this->getHttpClient()->shouldReturnAnInstanceOf(ClientInterface::class);
     }
 
-    function it_validate_response_or_trigger_an_exception($httpClient, $response)
+    function it_throw_exception_if_error_is_return_from_api($httpClient, ResponseInterface $response)
     {
+        $error = '{
+            "error": {
+                "message":"Invalid parameter",
+                "type":"FacebookApiException",
+                "code":100,
+                "error_data":"No matching user found.",
+                "fbtrace_id":"D2kxCybrKVw"
+            }
+        }';
+        $response->getBody()->willReturn($error);
+        
         $response->getStatusCode()->willReturn(400);
-        $response->getReasonPhrase()->willReturn('error message');
-        $response->getBody()->willReturn('{
-            "data": "value"
-        }');
-        $httpClient->request('GET', '/uri', Argument::any())->willReturn($response);
-        $this->shouldThrow(new ApiException('error message', ["data" => "value"]))->duringSend('GET', '/uri');
+        $response->getReasonPhrase()->willReturn('');
+
+        $httpClient->request('POST', '/uri', Argument::any())->willReturn($response);
+
+        $errorDecoded = json_decode($error, true);
+
+        $this->shouldThrow(new ApiException('Invalid parameter', 100, $errorDecoded))->duringSend('POST', '/uri');
+    }
+
+    function it_catch_exception_from_client_($httpClient)
+    {
+        $exception = new TransferException('Exception client');
+        $httpClient->request('POST', '/uri', Argument::any())->willThrow($exception);
+
+        $this->shouldThrow(new ApiException($exception->getMessage(),
+            $exception->getCode()
+        ))->duringSend('POST', '/uri');
     }
 }
