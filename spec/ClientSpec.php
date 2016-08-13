@@ -54,7 +54,7 @@ class ClientSpec extends ObjectBehavior
 
     function it_should_send_request_with_custom_headers($httpClient, $response)
     {
-        $httpClient->request('GET', '/uri', Argument::withEntry('headers', ['foo' => 'bar', 'Content-Type' => 'application/json']))->willReturn($response);
+        $httpClient->request('GET', '/uri', Argument::withEntry('headers', ['foo' => 'bar']))->willReturn($response);
         $this->send('GET', '/uri', null, [], ['foo' => 'bar'])->shouldReturn($response);
     }
 

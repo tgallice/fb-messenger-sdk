@@ -9,6 +9,8 @@ use Prophecy\Argument;
 use Psr\Http\Message\ResponseInterface;
 use Tgallice\FBMessenger\Client;
 use Tgallice\FBMessenger\Exception\ApiException;
+use Tgallice\FBMessenger\Model\Attachment;
+use Tgallice\FBMessenger\Model\Attachment\Template;
 use Tgallice\FBMessenger\Model\Message;
 use Tgallice\FBMessenger\Model\MessageResponse;
 use Tgallice\FBMessenger\Model\ThreadSetting;
@@ -78,6 +80,91 @@ class MessengerSpec extends ObjectBehavior
         $this->sendMessage('1008372609250235', $message)->shouldBeLike(
             new MessageResponse('1008372609250235', 'mid.1456970487936:c34767dfe57ee6e339')
         );
+    }
+
+    function it_send_text_message_to_user($client, ResponseInterface $response)
+    {
+        $client->send('POST', '/me/messages', null, [], [], Argument::that(function ($value) {
+            $message = $value['json']['message'];
+
+            if (!$message instanceof Message) {
+                return false;
+            }
+
+            return $message->getType() === 'text' && $message->getData() === 'message';
+        }))->willReturn($response);
+
+        $response->getBody()->willReturn('
+            {
+                "recipient_id": "1008372609250235",
+                "message_id": "mid.1456970487936:c34767dfe57ee6e339"
+            }
+        ');
+
+        $this->sendMessage('1008372609250235', 'message')->shouldBeLike(
+            new MessageResponse('1008372609250235', 'mid.1456970487936:c34767dfe57ee6e339')
+        );
+    }
+
+    function it_send_template_message_to_user($client, Template $template, ResponseInterface $response)
+    {
+        $client->send('POST', '/me/messages', null, [], [], Argument::that(function ($value) use ($template) {
+            $message = $value['json']['message'];
+
+            if (!$message instanceof Message) {
+                return false;
+            }
+
+            $data = $message->getData();
+
+            if (!$data instanceof Attachment) {
+                return false;
+            }
+
+            return $data->getType() === 'template' && $data->getPayload() === $template->getWrappedObject();
+        }))->willReturn($response);
+
+        $response->getBody()->willReturn('
+            {
+                "recipient_id": "1008372609250235",
+                "message_id": "mid.1456970487936:c34767dfe57ee6e339"
+            }
+        ');
+
+        $this->sendMessage('1008372609250235', $template)->shouldBeLike(
+            new MessageResponse('1008372609250235', 'mid.1456970487936:c34767dfe57ee6e339')
+        );
+    }
+
+    function it_send_attachment_message_to_user($client, Attachment $attachment, ResponseInterface $response)
+    {
+        $client->send('POST', '/me/messages', null, [], [], Argument::that(function ($value) use ($attachment) {
+            $message = $value['json']['message'];
+
+            if (!$message instanceof Message) {
+                return false;
+            }
+
+            return $message->getData() === $attachment->getWrappedObject();
+
+        }))->willReturn($response);
+
+        $response->getBody()->willReturn('
+            {
+                "recipient_id": "1008372609250235",
+                "message_id": "mid.1456970487936:c34767dfe57ee6e339"
+            }
+        ');
+
+        $this->sendMessage('1008372609250235', $attachment)->shouldBeLike(
+            new MessageResponse('1008372609250235', 'mid.1456970487936:c34767dfe57ee6e339')
+        );
+    }
+
+    function it_throw_an_exception_if_try_to_send_bad_message_type()
+    {
+        $exception = new \InvalidArgumentException('$message should be a string, Message, Attachment or Template');
+        $this->shouldThrow($exception)->duringSendMessage('1008372609250235', 1);
     }
 
     function it_subscribe_the_app($client, ResponseInterface $response)

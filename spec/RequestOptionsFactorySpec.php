@@ -4,6 +4,7 @@ namespace spec\Tgallice\FBMessenger;
 
 use GuzzleHttp\RequestOptions;
 use PhpSpec\ObjectBehavior;
+use Tgallice\FBMessenger\Client;
 use Tgallice\FBMessenger\Model\Message;
 
 class RequestOptionsFactorySpec extends ObjectBehavior
@@ -37,7 +38,8 @@ class RequestOptionsFactorySpec extends ObjectBehavior
                     'name' => 'filedata',
                     'contents' => 'stream',
                 ]
-            ]
+            ],
+            'timeout' => Client::DEFAULT_FILE_UPLOAD_TIMEOUT,
         ]);
     }
 

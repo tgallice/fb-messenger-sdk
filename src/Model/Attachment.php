@@ -21,6 +21,12 @@ class Attachment implements \JsonSerializable
      */
     private $payload;
 
+    /**
+     * Attachment constructor.
+     *
+     * @param $type
+     * @param array|Template $payload
+     */
     public function __construct($type, $payload = [])
     {
         $this->type = $type;

@@ -23,7 +23,12 @@ class Client
     /**
      * Request default timeout
      */
-    const DEFAULT_TIMEOUT = 5;
+    const DEFAULT_TIMEOUT = 60;
+
+    /**
+     * Request default file upload timeout
+     */
+    const DEFAULT_FILE_UPLOAD_TIMEOUT = 3600;
 
     /**
      * @var array
@@ -86,7 +91,6 @@ class Client
 
     /**
      * @param string $uri
-     * @param array $options
      *
      * @return ResponseInterface
      */
@@ -114,7 +118,7 @@ class Client
         try {
             $options[RequestOptions::BODY] = $body;
             $options[RequestOptions::QUERY] = $query;
-            $options[RequestOptions::HEADERS] = array_merge($this->defaultHeaders(), $headers);
+            $options[RequestOptions::HEADERS] = $headers;
 
             $this->lastResponse = $this->client->request($method, $uri, $options);
         } catch (GuzzleException $e) {
@@ -172,14 +176,7 @@ class Client
         return new \GuzzleHttp\Client([
             'base_uri' => self::API_BASE_URI . self::DEFAULT_API_VERSION,
             'timeout' => self::DEFAULT_TIMEOUT,
-            'connect_timeout' => self::DEFAULT_TIMEOUT,
+            'connect_timeout' => 10,
         ]);
-    }
-
-    private function defaultHeaders()
-    {
-        return [
-            'Content-Type' => 'application/json',
-        ];
     }
 }

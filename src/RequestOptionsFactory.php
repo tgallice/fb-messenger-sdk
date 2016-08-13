@@ -8,7 +8,7 @@ use Tgallice\FBMessenger\Model\Message;
 class RequestOptionsFactory
 {
     /**
-     * @param string $recipient
+     * @param string $recipientOrPhone
      * @param Message $message
      * @param string $notificationType
      *
@@ -44,6 +44,9 @@ class RequestOptionsFactory
                     'contents' => $message->getFileStream(),
                 ],
             ];
+
+            // Update timeout if we upload a file
+            $options['timeout'] = Client::DEFAULT_FILE_UPLOAD_TIMEOUT;
 
             return $options;
         }

@@ -3,6 +3,8 @@
 namespace Tgallice\FBMessenger;
 
 use Tgallice\FBMessenger\Exception\ApiException;
+use Tgallice\FBMessenger\Model\Attachment;
+use Tgallice\FBMessenger\Model\Attachment\Template;
 use Tgallice\FBMessenger\Model\Message;
 use Tgallice\FBMessenger\Model\MessageResponse;
 use Tgallice\FBMessenger\Model\ThreadSetting;
@@ -21,7 +23,6 @@ class Messenger
     private $client;
 
     /**
-     * @param string $token
      * @param Client $client
      */
     public function __construct(Client $client)
@@ -31,15 +32,16 @@ class Messenger
 
     /**
      * @param string $recipient
-     * @param Message $message
+     * @param string|Message|Attachment|Template $message
      * @param string $notificationType
      *
      * @return MessageResponse
      *
      * @throws ApiException
      */
-    public function sendMessage($recipient, Message $message, $notificationType = NotificationType::REGULAR)
+    public function sendMessage($recipient, $message, $notificationType = NotificationType::REGULAR)
     {
+        $message = $this->createMessage($message);
         $options = RequestOptionsFactory::createForMessage($recipient, $message, $notificationType);
         $response = $this->client->send('POST', '/me/messages', null, [], [], $options);
         $responseData = $this->decodeResponse($response);
@@ -152,6 +154,21 @@ class Messenger
     }
 
     /**
+     * Messenger Factory
+     *
+     * @param string $token
+     *
+     * @return Messenger
+     */
+    public static function create($token)
+    {
+        $client = new Client($token);
+
+        return new self($client);
+    }
+
+
+    /**
      * @param array $setting
      */
     private function postThreadSettings(array $setting)
@@ -180,7 +197,7 @@ class Messenger
             'setting_type' => $type,
         ];
 
-        if ($threadState) {
+        if (!empty($threadState)) {
             $setting['thread_state'] = $threadState;
         }
 
@@ -189,5 +206,27 @@ class Messenger
         }
 
         return $setting;
+    }
+
+    /**
+     * @param string|Message|Attachment|Template $message
+     *
+     * @return Message
+     */
+    private function createMessage($message)
+    {
+        if ($message instanceof Message) {
+            return $message;
+        }
+
+        if ($message instanceof Template) {
+            $message = new Attachment(Attachment::TYPE_TEMPLATE, $message);
+        }
+
+        if (is_string($message) || $message instanceof Attachment) {
+            return new Message($message);
+        }
+
+        throw new \InvalidArgumentException('$message should be a string, Message, Attachment or Template');
     }
 }

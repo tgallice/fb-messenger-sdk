@@ -31,7 +31,6 @@ class Message implements \JsonSerializable
     private $metadata;
 
     /**
-     * @param string $type
      * @param string|Attachment $data
      */
     public function __construct($data)
@@ -45,6 +44,14 @@ class Message implements \JsonSerializable
         }
 
         $this->data = $data;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
     }
 
     /**
@@ -84,7 +91,7 @@ class Message implements \JsonSerializable
     }
 
     /**
-     * @param QuickReply $quickReplies
+     * @param QuickReply $quickReply
      */
     public function addQuickReply(QuickReply $quickReply)
     {
