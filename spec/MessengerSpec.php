@@ -40,13 +40,17 @@ class MessengerSpec extends ObjectBehavior
             }
         ');
 
-        $client->send('GET', '/user_id', [
-            RequestOptions::QUERY => [
-                'fields' => 'first_name,last_name,profile_pic',
-            ],
-        ])->willReturn($response);
+        $query = [
+            'fields' => 'first_name,last_name,profile_pic',
+        ];
 
-        $userProfile = new UserProfile('Peter', 'Chang', "https://fbcdn-profile-a.akamaihd.net/hprofile70ec9c19b18");
+        $client->get('/user_id', $query)->willReturn($response);
+
+        $userProfile = new UserProfile([
+            'first_name' => 'Peter',
+            'last_name' => 'Chang',
+            'profile_pic' => 'https://fbcdn-profile-a.akamaihd.net/hprofile70ec9c19b18'
+        ]);
 
         $this->getUserProfile('user_id', ['first_name', 'last_name', 'profile_pic'])
             ->shouldBeLike($userProfile);
@@ -74,44 +78,6 @@ class MessengerSpec extends ObjectBehavior
         $this->sendMessage('1008372609250235', $message)->shouldBeLike(
             new MessageResponse('1008372609250235', 'mid.1456970487936:c34767dfe57ee6e339')
         );
-    }
-
-    function it_throw_exception_if_error_is_return_from_api($client, ResponseInterface $response)
-    {
-        $response->getBody()->willReturn('{
-            "error": {
-                "message":"Invalid parameter",
-                "type":"FacebookApiException",
-                "code":100,
-                "error_data":"No matching user found.",
-                "fbtrace_id":"D2kxCybrKVw"
-            }
-        }');
-
-        $client->send('POST', '/uri', Argument::any())->willReturn($response);
-
-        $error = json_decode('
-            {
-                "message":"Invalid parameter",
-                "type":"FacebookApiException",
-                "code":100,
-                "error_data":"No matching user found.",
-                "fbtrace_id":"D2kxCybrKVw"
-            }
-        ', true);
-
-        $this->shouldThrow(new ApiException('Invalid parameter', $error))->duringSend('POST', '/uri');
-    }
-
-    function it_catch_exception_from_client_($client)
-    {
-        $exception = new TransferException('Exception client');
-        $client->send('POST', '/uri', Argument::any())->willThrow($exception);
-
-        $this->shouldThrow(new ApiException('Exception client', [
-            'code' => $exception->getCode(),
-            'exception' => $exception,
-        ]))->duringSend('POST', '/uri');
     }
 
     function it_subscribe_the_app($client, ResponseInterface $response)

@@ -5,34 +5,23 @@ namespace Tgallice\FBMessenger\Model;
 class UserProfile
 {
     const FIRST_NAME = 'first_name';
-
     const LAST_NAME = 'last_name';
-
     const PROFILE_PIC = 'profile_pic';
+    const LOCALE = 'locale';
+    const TIMEZONE = 'timezone';
+    const GENDER = 'gender';
 
     /**
-     * @var null|string
+     * @var array
      */
-    private $firstName;
-    /**
-     * @var null|string
-     */
-    private $lastName;
-    /**
-     * @var null|string
-     */
-    private $profilePic;
+    private $data;
 
     /**
-     * @param null|string $firstName
-     * @param null|string $lastName
-     * @param null|string $profilePic
+     * @param array $data
      */
-    public function __construct($firstName = null, $lastName = null, $profilePic = null)
+    public function __construct(array $data)
     {
-        $this->firstName = $firstName;
-        $this->lastName = $lastName;
-        $this->profilePic = $profilePic;
+        $this->data = $data;
     }
 
     /**
@@ -40,7 +29,7 @@ class UserProfile
      */
     public function getFirstName()
     {
-        return $this->firstName;
+        return $this->get(self::FIRST_NAME);
     }
 
     /**
@@ -48,7 +37,7 @@ class UserProfile
      */
     public function getLastName()
     {
-        return $this->lastName;
+        return $this->get(self::LAST_NAME);
     }
 
     /**
@@ -56,21 +45,45 @@ class UserProfile
      */
     public function getProfilePic()
     {
-        return $this->profilePic;
+        return $this->get(self::PROFILE_PIC);
     }
 
-    public static function create($data)
+    /**
+     * @return null|string
+     */
+    public function getLocale()
     {
-        $data = array_merge([
-            UserProfile::FIRST_NAME => null,
-            UserProfile::LAST_NAME => null,
-            UserProfile::PROFILE_PIC => null,
-        ], $data);
+        return $this->get(self::LOCALE);
+    }
 
-        return new self(
-            $data[UserProfile::FIRST_NAME],
-            $data[UserProfile::LAST_NAME],
-            $data[UserProfile::PROFILE_PIC]
-        );
+    /**
+     * @return null|string
+     */
+    public function getTimezone()
+    {
+        return $this->get(self::TIMEZONE);
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getGender()
+    {
+        return $this->get(self::GENDER);
+    }
+
+    private function get($index)
+    {
+        return isset($this->data[$index]) ? $this->data[$index] : null;
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return UserProfile
+     */
+    public static function create(array $data)
+    {
+        return new self($data);
     }
 }

@@ -2,7 +2,6 @@
 
 namespace Tgallice\FBMessenger;
 
-use GuzzleHttp\RequestOptions;
 use Tgallice\FBMessenger\Exception\ApiException;
 use Tgallice\FBMessenger\Model\Message;
 use Tgallice\FBMessenger\Model\MessageResponse;
@@ -60,17 +59,19 @@ class Messenger
             UserProfile::FIRST_NAME,
             UserProfile::LAST_NAME,
             UserProfile::PROFILE_PIC,
+            UserProfile::LOCALE,
+            UserProfile::TIMEZONE,
+            UserProfile::GENDER,
         ]
     ) {
-        $options = [
-            RequestOptions::QUERY => [
-                'fields' => implode(',', $fields)
-            ]
+        $query = [
+            'fields' => implode(',', $fields)
         ];
 
-        $responseData = $this->send('GET', sprintf('/%s', $userId), $options);
+        $response = $this->client->get(sprintf('/%s', $userId), $query);
+        $data = $this->decodeResponse($response);
 
-        return UserProfile::create($responseData);
+        return UserProfile::create($data);
     }
 
     /**
@@ -169,11 +170,11 @@ class Messenger
     /**
      * @param string $type
      * @param null|string $threadState
-     * @param array $value
+     * @param mixed $value
      *
      * @return array
      */
-    private function buildSetting($type, $threadState = null, array $value = [])
+    private function buildSetting($type, $threadState = null, $value = null)
     {
         $setting = [
             'setting_type' => $type,
