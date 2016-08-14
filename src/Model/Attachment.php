@@ -6,8 +6,10 @@ use Tgallice\FBMessenger\Model\Attachment\Template;
 
 class Attachment implements \JsonSerializable
 {
-    const TYPE_IMAGE = 'image';
+    const TYPE_AUDIO = 'audio';
     const TYPE_FILE = 'file';
+    const TYPE_IMAGE = 'image';
+    const TYPE_VIDEO = 'video';
 
     const TYPE_TEMPLATE = 'template';
 

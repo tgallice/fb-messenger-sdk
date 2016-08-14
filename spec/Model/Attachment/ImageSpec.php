@@ -3,13 +3,10 @@
 namespace spec\Tgallice\FBMessenger\Model\Attachment;
 
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 use Tgallice\FBMessenger\Model\Attachment;
 
 class ImageSpec extends ObjectBehavior
 {
-    private $_filename;
-
     function let()
     {
         $this->beConstructedWith('file.png');
