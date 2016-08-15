@@ -173,7 +173,7 @@ class Messenger
      */
     private function postThreadSettings(array $setting)
     {
-        $this->client->post('/me/thread_settings', json_encode($setting));
+        $this->client->post('/me/thread_settings', $setting);
     }
 
     /**
@@ -181,7 +181,7 @@ class Messenger
      */
     private function deleteThreadSettings(array $setting)
     {
-        $this->client->send('DELETE', '/me/thread_settings', json_encode($setting));
+        $this->client->send('DELETE', '/me/thread_settings', $setting);
     }
 
     /**

@@ -28,6 +28,19 @@ class ClientSpec extends ObjectBehavior
         $this->post('/uri', 'value')->shouldReturn($response);
     }
 
+    function it_convert_array_body_as_json_content($httpClient, $response)
+    {
+        $body = ['value' => 'test'];
+
+        $httpClient->request('POST', '/uri', Argument::that(function ($options) use ($body) {
+            return $options['body'] === json_encode($body) && $options['headers']['Content-Type'] === 'application/json';
+        }))->willReturn($response);
+
+        $this->post('/uri', $body)->shouldReturn($response);
+
+        $this->send('POST', '/uri', $body)->shouldReturn($response);
+    }
+
     function it_has_shortcut_get_request($httpClient, $response)
     {
         $httpClient->request('GET', '/uri', Argument::withEntry('query', ['q' => 'text', 'access_token' => 'token']))->willReturn($response);
@@ -36,7 +49,7 @@ class ClientSpec extends ObjectBehavior
 
     function it_has_shortcut_put_request($httpClient, $response)
     {
-        $httpClient->request('PUT', '/uri', Argument::withEntry('body', ['obj' => 'value']))->willReturn($response);
+        $httpClient->request('PUT', '/uri', Argument::withEntry('body', json_encode(['obj' => 'value'])))->willReturn($response);
         $this->put('/uri', ['obj' => 'value'])->shouldReturn($response);
     }
 

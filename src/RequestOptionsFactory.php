@@ -62,5 +62,4 @@ class RequestOptionsFactory
 
         return [$recipientFieldName => $recipientOrPhone];
     }
-
 }

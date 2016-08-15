@@ -58,7 +58,7 @@ class Client
 
     /**
      * @param string $uri
-     * @param string|null $body
+     * @param mixed $body
      *
      * @return ResponseInterface
      */
@@ -80,7 +80,7 @@ class Client
 
     /**
      * @param string $uri
-     * @param null|string $data
+     * @param mixed $data
      *
      * @return ResponseInterface
      */
@@ -113,13 +113,9 @@ class Client
      */
     public function send($method, $uri, $body = null, array $query = [], array $headers = [], array $options = [])
     {
-        $query = $this->addToken($query);
+        $options = $this->enhanceOptions($body, $query, $headers, $options);
 
         try {
-            $options[RequestOptions::BODY] = $body;
-            $options[RequestOptions::QUERY] = $query;
-            $options[RequestOptions::HEADERS] = $headers;
-
             $this->lastResponse = $this->client->request($method, $uri, $options);
         } catch (GuzzleException $e) {
             throw new ApiException($e->getMessage(), $e->getCode());
@@ -143,13 +139,6 @@ class Client
     public function getHttpClient()
     {
         return $this->client;
-    }
-
-    private function addToken(array $query)
-    {
-        $query['access_token'] = $this->accessToken;
-
-        return $query;
     }
 
     /**
@@ -178,5 +167,25 @@ class Client
             'timeout' => self::DEFAULT_TIMEOUT,
             'connect_timeout' => 10,
         ]);
+    }
+
+    private function enhanceOptions($body = null, array $query = [], array $headers = [], array $options = [])
+    {
+        // Add token
+        if (!isset($query['access_token'])) {
+            $query['access_token'] = $this->accessToken;
+        }
+
+        if (!empty($body) && is_array($body)) {
+            // Encode and set the content type
+            $body = json_encode($body);
+            $headers['Content-Type'] = 'application/json';
+        }
+
+        $options[RequestOptions::BODY] = $body;
+        $options[RequestOptions::QUERY] = $query;
+        $options[RequestOptions::HEADERS] = $headers;
+
+        return $options;
     }
 }

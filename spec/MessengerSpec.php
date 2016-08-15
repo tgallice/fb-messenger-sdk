@@ -184,21 +184,23 @@ class MessengerSpec extends ObjectBehavior
     // Thread settings
     function it_should_define_greeting_text($client)
     {
-        $body = [
+        $expectedBody = [
             'setting_type' => 'greeting',
             'greeting' => [
                 'text' => 'my text',
             ],
         ];
 
-        $client->post('/me/thread_settings', json_encode($body))->shouldBeCalled();
+        $client->post('/me/thread_settings', Argument::that(function ($body) use ($expectedBody) {
+            return json_encode($body) === json_encode($expectedBody);
+        }))->shouldBeCalled();
 
         $this->setGreetingText('my text');
     }
 
     function it_should_define_get_started_button($client)
     {
-        $body = [
+        $expectedBody = [
             'setting_type' => 'call_to_actions',
             'thread_state' => 'new_thread',
             'call_to_actions' => [
@@ -206,7 +208,9 @@ class MessengerSpec extends ObjectBehavior
             ],
         ];
 
-        $client->post('/me/thread_settings', json_encode($body))->shouldBeCalled();
+        $client->post('/me/thread_settings', Argument::that(function ($body) use ($expectedBody) {
+            return json_encode($body) === json_encode($expectedBody);
+        }))->shouldBeCalled();
 
         $this->setStartedButton('my_payload');
     }
@@ -218,41 +222,33 @@ class MessengerSpec extends ObjectBehavior
             'thread_state' => 'new_thread',
         ];
 
-        $client->send('DELETE', '/me/thread_settings', json_encode($body))->shouldBeCalled();
+        $client->send('DELETE', '/me/thread_settings', $body)->shouldBeCalled();
 
         $this->deleteStartedButton();
     }
 
     function it_should_define_persistent_menu($client)
     {
+        $pb1 = new Postback('Help', 'DEVELOPER_DEFINED_PAYLOAD_FOR_HELP');
+        $pb2 = new Postback('Start a New Order', 'DEVELOPER_DEFINED_PAYLOAD_FOR_START_ORDER');
+        $wu = new WebUrl('View Website', 'http://petersapparel.parseapp.com/');
+
         $body = [
             'setting_type' => 'call_to_actions',
             'thread_state' => 'existing_thread',
             'call_to_actions' => [
-                [
-                    'type' => 'postback',
-                    'title' => 'Help',
-                    'payload' => 'DEVELOPER_DEFINED_PAYLOAD_FOR_HELP',
-                ],
-                [
-                    'type' => 'postback',
-                    'title' => 'Start a New Order',
-                    'payload' => 'DEVELOPER_DEFINED_PAYLOAD_FOR_START_ORDER',
-                ],
-                [
-                    'type' => 'web_url',
-                    'title' => 'View Website',
-                    'url' => 'http://petersapparel.parseapp.com/',
-                ],
+                $pb1,
+                $pb2,
+                $wu,
             ]
         ];
 
-        $client->post('/me/thread_settings', json_encode($body))->shouldBeCalled();
+        $client->post('/me/thread_settings', $body)->shouldBeCalled();
 
         $this->setPersistentMenu([
-            new Postback('Help', 'DEVELOPER_DEFINED_PAYLOAD_FOR_HELP'),
-            new Postback('Start a New Order', 'DEVELOPER_DEFINED_PAYLOAD_FOR_START_ORDER'),
-            new WebUrl('View Website', 'http://petersapparel.parseapp.com/'),
+            $pb1,
+            $pb2,
+            $wu,
         ]);
     }
 
@@ -271,7 +267,7 @@ class MessengerSpec extends ObjectBehavior
             'thread_state' => 'existing_thread',
         ];
 
-        $client->send('DELETE', '/me/thread_settings', json_encode($body))->shouldBeCalled();
+        $client->send('DELETE', '/me/thread_settings', $body)->shouldBeCalled();
 
         $this->deletePersistentMenu();
     }
