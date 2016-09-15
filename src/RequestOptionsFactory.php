@@ -3,51 +3,63 @@
 namespace Tgallice\FBMessenger;
 
 use GuzzleHttp\RequestOptions;
-use Tgallice\FBMessenger\Attachment\Image;
-use Tgallice\FBMessenger\Message\Message;
+use Tgallice\FBMessenger\Model\Message;
 
 class RequestOptionsFactory
 {
     /**
+     * @param string $recipientOrPhone
      * @param Message $message
+     * @param string $notificationType
      *
      * @return array
      */
-    public static function create(Message $message)
+    public static function createForMessage($recipientOrPhone, Message $message, $notificationType = NotificationType::REGULAR)
     {
         $options = [];
-        $formattedMessage = $message->format();
-
+        $data = [
+            'recipient' => self::createRecipientField($recipientOrPhone),
+            'message' => $message,
+            'notification_type' => $notificationType,
+        ];
+        
         if ($message->hasFileToUpload()) {
-
-            /** @var Image $messageData */
-            $messageData = $message->getMessageData();
 
             // Create a multipart request
             $options[RequestOptions::MULTIPART] = [
                 [
                     'name' => 'recipient',
-                    'contents' => json_encode($formattedMessage['recipient']),
+                    'contents' => json_encode($data['recipient']),
                 ],
                 [
                     'name' => 'message',
-                    'contents' => json_encode($formattedMessage['message']),
+                    'contents' => json_encode($data['message']),
                 ],
                 [
                     'name' => 'notification_type',
-                    'contents' => $formattedMessage['notification_type'],
+                    'contents' => $data['notification_type'],
                 ],
                 [
                     'name' => 'filedata',
-                    'contents' => $messageData->open(),
+                    'contents' => $message->getFileStream(),
                 ],
             ];
+
+            // Update timeout if we upload a file
+            $options['timeout'] = Client::DEFAULT_FILE_UPLOAD_TIMEOUT;
 
             return $options;
         }
 
-        $options[RequestOptions::JSON] = $formattedMessage;
+        $options[RequestOptions::JSON] = $data;
 
         return $options;
+    }
+
+    public static function createRecipientField($recipientOrPhone)
+    {
+        $recipientFieldName = strpos($recipientOrPhone, '+') === 0 ? 'phone_number' : 'id';
+
+        return [$recipientFieldName => $recipientOrPhone];
     }
 }

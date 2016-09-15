@@ -1,11 +1,10 @@
 <?php
 
-namespace Tgallice\FBMessenger\Model;
+namespace Tgallice\FBMessenger\Model\ThreadSetting;
 
-class Button implements \JsonSerializable
+class MenuItem implements \JsonSerializable
 {
     const TYPE_POSTBACK = 'postback';
-    const TYPE_PHONE_NUMBER = 'phone_number';
     const TYPE_WEB_URL = 'web_url';
 
     /**
@@ -28,7 +27,7 @@ class Button implements \JsonSerializable
     /**
      * @param string $type
      * @param string $title
-     * @param string $data Url, phone number or payload value
+     * @param string $data Url or payload value
      */
     public function __construct($type, $title, $data)
     {
@@ -39,8 +38,6 @@ class Button implements \JsonSerializable
 
         if ($this->type === self::TYPE_POSTBACK) {
             $this->validatePayload($data);
-        } elseif ($this->type === self::TYPE_PHONE_NUMBER) {
-            $this->validatePhoneNumber($data);
         }
 
         $this->data = $data;
@@ -96,8 +93,8 @@ class Button implements \JsonSerializable
      */
     private function validateTitleSize($title)
     {
-        if (mb_strlen($title) > 20) {
-            throw new \InvalidArgumentException('The button title field should not exceed 20 characters.');
+        if (mb_strlen($title) > 30) {
+            throw new \InvalidArgumentException('The menu item title field should not exceed 30 characters.');
         }
     }
 
@@ -111,21 +108,6 @@ class Button implements \JsonSerializable
         if (mb_strlen($payload) > 1000) {
             throw new \InvalidArgumentException(sprintf(
                     'Payload should not exceed 1000 characters.', $payload)
-            );
-        }
-    }
-
-    /**
-     * @param $phoneNumber
-     *
-     * @throws \InvalidArgumentException
-     */
-    private function validatePhoneNumber($phoneNumber)
-    {
-        // Dummy phone number check
-        if (strpos($phoneNumber, '+') !== 0) {
-            throw new \InvalidArgumentException(sprintf(
-                    'The phone number "%s" seem to be invalid. Please check the documentation to format the phone number.', $phoneNumber)
             );
         }
     }

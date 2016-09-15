@@ -8,7 +8,7 @@ class UserProfileSpec extends ObjectBehavior
 {
     function let()
     {
-        $this->beConstructedWith('first_name', 'last_name', 'profile_pic');
+        $this->beConstructedWith(['first_name' => 'name', 'last_name' => 'last name', 'profile_pic' => 'pic']);
     }
 
     function it_is_initializable()
@@ -18,16 +18,16 @@ class UserProfileSpec extends ObjectBehavior
 
     function it_should_return_the_first_name()
     {
-        $this->getFirstName()->shouldReturn('first_name');
+        $this->getFirstName()->shouldReturn('name');
     }
 
     function it_should_return_the_last_name()
     {
-        $this->getLastName()->shouldReturn('last_name');
+        $this->getLastName()->shouldReturn('last name');
     }
 
     function it_should_return_the_profile_pic()
     {
-        $this->getProfilePic()->shouldReturn('profile_pic');
+        $this->getProfilePic()->shouldReturn('pic');
     }
 }

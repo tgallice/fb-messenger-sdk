@@ -2,59 +2,49 @@
 
 namespace Tgallice\FBMessenger;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\RequestOptions;
-use Psr\Http\Message\ResponseInterface;
-use Tgallice\FBMessenger\Attachment\Structured;
 use Tgallice\FBMessenger\Exception\ApiException;
-use Tgallice\FBMessenger\Message\Message;
+use Tgallice\FBMessenger\Model\Attachment;
+use Tgallice\FBMessenger\Model\Attachment\Template;
+use Tgallice\FBMessenger\Model\Message;
 use Tgallice\FBMessenger\Model\MessageResponse;
+use Tgallice\FBMessenger\Model\ThreadSetting;
+use Tgallice\FBMessenger\Model\ThreadSetting\GreetingText;
+use Tgallice\FBMessenger\Model\ThreadSetting\StartedButton;
+use Tgallice\FBMessenger\Model\ThreadSetting\MenuItem;
 use Tgallice\FBMessenger\Model\UserProfile;
 
 class Messenger
 {
-    const API_BASE_URI = 'https://graph.facebook.com/v2.6';
+    use ResponseHandler;
 
     /**
-     * @var string
-     */
-    private $token;
-
-    /**
-     * @var ClientInterface
+     * @var Client
      */
     private $client;
 
     /**
-     * @var ResponseInterface
+     * @param Client $client
      */
-    private $lastResponse;
-
-    /**
-     * @param string $token
-     * @param ClientInterface $client
-     */
-    public function __construct($token, ClientInterface $client = null)
+    public function __construct(Client $client)
     {
-        $this->token = $token;
-        $this->client = $client ?: new Client([
-            'base_uri' => self::API_BASE_URI,
-        ]);
+        $this->client = $client;
     }
 
     /**
-     * @param Message $message
+     * @param string $recipient
+     * @param string|Message|Attachment|Template $message
+     * @param string $notificationType
      *
      * @return MessageResponse
      *
      * @throws ApiException
      */
-    public function sendMessage(Message $message)
+    public function sendMessage($recipient, $message, $notificationType = NotificationType::REGULAR)
     {
-        $options = RequestOptionsFactory::create($message);
-        $responseData = $this->send('POST', '/me/messages', $options);
+        $message = $this->createMessage($message);
+        $options = RequestOptionsFactory::createForMessage($recipient, $message, $notificationType);
+        $response = $this->client->send('POST', '/me/messages', null, [], [], $options);
+        $responseData = $this->decodeResponse($response);
 
         return new MessageResponse($responseData['recipient_id'], $responseData['message_id']);
     }
@@ -71,32 +61,19 @@ class Messenger
             UserProfile::FIRST_NAME,
             UserProfile::LAST_NAME,
             UserProfile::PROFILE_PIC,
+            UserProfile::LOCALE,
+            UserProfile::TIMEZONE,
+            UserProfile::GENDER,
         ]
     ) {
-        $options = [
-            RequestOptions::QUERY => [
-                'fields' => implode(',', $fields)
-            ]
+        $query = [
+            'fields' => implode(',', $fields)
         ];
 
-        $responseData = $this->send('GET', sprintf('/%s', $userId), $options);
+        $response = $this->client->get(sprintf('/%s', $userId), $query);
+        $data = $this->decodeResponse($response);
 
-        return UserProfile::create($responseData);
-    }
-
-    /**
-     * @param string|Structured $message
-     * @param string $pageId
-     *
-     * @return array
-     */
-    public function setWelcomeMessage($message, $pageId)
-    {
-        $options = [
-            RequestOptions::JSON => $this->buildWelcomeData($message),
-        ];
-
-        return $this->send('POST', sprintf('/%s/thread_settings', $pageId), $options);
+        return UserProfile::create($data);
     }
 
     /**
@@ -106,117 +83,150 @@ class Messenger
      */
     public function subscribe()
     {
-        $response = $this->send('POST', '/me/subscribed_apps');
+        $response = $this->client->post('/me/subscribed_apps');
+        $decoded = $this->decodeResponse($response);
 
-        return $response['success'];
+        return $decoded['success'];
     }
 
     /**
-     * @param string $pageId
-     *
-     * @return array
+     * @param $text
      */
-    public function deleteWelcomeMessage($pageId)
+    public function setGreetingText($text)
     {
-        $options = [
-            RequestOptions::JSON => $this->buildWelcomeData(),
-        ];
+        $greeting = new GreetingText($text);
+        $setting = $this->buildSetting(ThreadSetting::TYPE_GREETING, null, $greeting);
 
-        return $this->send('POST', sprintf('/%s/thread_settings', $pageId), $options);
+        $this->postThreadSettings($setting);
     }
 
     /**
-     * @param $method
-     * @param $uri
-     * @param array $options
-     *
-     * @return array
-     *
-     * @throws ApiException
+     * @param string $payload
      */
-    public function send($method, $uri, array $options = [])
+    public function setStartedButton($payload)
     {
-        try {
-            $response = $this->client->request($method, $uri, $this->buildOptions($options));
-            // Catch all Guzzle\Request exceptions
-        } catch (GuzzleException $e) {
-            throw new ApiException($e->getMessage(), [
-                'code' => $e->getCode(),
-                'exception' => $e,
-            ]);
+        $startedButton = new StartedButton($payload);
+        $setting = $this->buildSetting(
+            ThreadSetting::TYPE_CALL_TO_ACTIONS,
+            ThreadSetting::NEW_THREAD,
+            [$startedButton]
+        );
+
+        $this->postThreadSettings($setting);
+    }
+
+    public function deleteStartedButton()
+    {
+        $setting = $this->buildSetting(
+            ThreadSetting::TYPE_CALL_TO_ACTIONS,
+            ThreadSetting::NEW_THREAD
+        );
+
+        $this->deleteThreadSettings($setting);
+    }
+
+    /**
+     * @param MenuItem[] $menuItems
+     */
+    public function setPersistentMenu(array $menuItems)
+    {
+        if (count($menuItems) > 5) {
+            throw new \InvalidArgumentException('You should not set more than 5 menu items.');
         }
 
-        $this->lastResponse = $response;
+        $setting = $this->buildSetting(
+            ThreadSetting::TYPE_CALL_TO_ACTIONS,
+            ThreadSetting::EXISTING_THREAD,
+            $menuItems
+        );
 
-        return $this->getResponseData($response);
+        $this->postThreadSettings($setting);
+    }
+
+    public function deletePersistentMenu()
+    {
+        $setting = $this->buildSetting(
+            ThreadSetting::TYPE_CALL_TO_ACTIONS,
+            ThreadSetting::EXISTING_THREAD
+        );
+
+        $this->deleteThreadSettings($setting);
     }
 
     /**
-     * Return the decoded body data
+     * Messenger Factory
      *
-     * @param ResponseInterface $response
+     * @param string $token
+     *
+     * @return Messenger
+     */
+    public static function create($token)
+    {
+        $client = new Client($token);
+
+        return new self($client);
+    }
+
+
+    /**
+     * @param array $setting
+     */
+    private function postThreadSettings(array $setting)
+    {
+        $this->client->post('/me/thread_settings', $setting);
+    }
+
+    /**
+     * @param array $setting
+     */
+    private function deleteThreadSettings(array $setting)
+    {
+        $this->client->send('DELETE', '/me/thread_settings', $setting);
+    }
+
+    /**
+     * @param string $type
+     * @param null|string $threadState
+     * @param mixed $value
      *
      * @return array
-     *
-     * @throws ApiException
      */
-    private function getResponseData(ResponseInterface $response)
+    private function buildSetting($type, $threadState = null, $value = null)
     {
-        $responseData = $this->decodeResponseBody($response);
-
-        if (isset($responseData['error'])) {
-            $message = isset($responseData['error']['message']) ? $responseData['error']['message'] : 'Unknown error';
-            throw new ApiException($message, $responseData['error']);
-        }
-
-        return $responseData;
-    }
-
-    /**
-     * @param ResponseInterface $response
-     *
-     * @return null|array
-     */
-    private function decodeResponseBody(ResponseInterface $response)
-    {
-        return json_decode((string) $response->getBody(), true);
-    }
-
-    /**
-     * @param array $options
-     *
-     * @return array
-     */
-    private function buildOptions(array $options = [])
-    {
-        $options[RequestOptions::QUERY]['access_token'] = $this->token;
-
-        return $options;
-    }
-
-    /**
-     * @param mixed $message
-     *
-     * @return array
-     */
-    private function buildWelcomeData($message = null)
-    {
-        $data = [
-            'setting_type' => 'call_to_actions',
-            'thread_state' => 'new_thread',
-            'call_to_actions' => [],
+        $setting = [
+            'setting_type' => $type,
         ];
 
-        if (null === $message) {
-            return $data;
+        if (!empty($threadState)) {
+            $setting['thread_state'] = $threadState;
         }
 
-        $type = is_string($message) ? 'text' : 'attachment';
+        if (!empty($value)) {
+            $setting[$type] = $value;
+        }
 
-        $data['call_to_actions'][] = [
-            'message' => [$type => $message],
-        ];
+        return $setting;
+    }
 
-        return $data;
+    /**
+     * @param string|Message|Attachment|Template $message
+     *
+     * @return Message
+     */
+    private function createMessage($message)
+    {
+        if ($message instanceof Message) {
+            return $message;
+        }
+
+        if ($message instanceof Template) {
+            $message = new Attachment(Attachment::TYPE_TEMPLATE, $message);
+        }
+
+        if (is_string($message) || $message instanceof Attachment) {
+            return new Message($message);
+        }
+
+        throw new \InvalidArgumentException('$message should be a string, Message, Attachment or Template');
     }
 }
