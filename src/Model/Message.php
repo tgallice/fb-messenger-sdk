@@ -11,12 +11,12 @@ class Message implements \JsonSerializable
     const TYPE_ATTACHMENT = 'attachment';
 
     /**
-     * @var string[Attachment
+     * @var string|Attachment
      */
     private $type;
 
     /**
-     * @var string[Attachment
+     * @var string|Attachment
      */
     private $data;
 

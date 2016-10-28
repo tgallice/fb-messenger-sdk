@@ -2,16 +2,12 @@
 
 namespace Tgallice\FBMessenger\Model;
 
-class Button implements \JsonSerializable
+abstract class Button implements \JsonSerializable
 {
     const TYPE_POSTBACK = 'postback';
     const TYPE_PHONE_NUMBER = 'phone_number';
     const TYPE_WEB_URL = 'web_url';
-
-    /**
-     * @var string
-     */
-    private $title;
+    const TYPE_SHARE = 'element_share';
 
     /**
      * @var string
@@ -19,31 +15,11 @@ class Button implements \JsonSerializable
     private $type;
 
     /**
-     * Url or payload
-     *
-     * @var string
-     */
-    protected $data;
-
-    /**
      * @param string $type
-     * @param string $title
-     * @param string $data Url, phone number or payload value
      */
-    public function __construct($type, $title, $data)
+    public function __construct($type)
     {
         $this->type = $type;
-
-        $this->validateTitleSize($title);
-        $this->title = $title;
-
-        if ($this->type === self::TYPE_POSTBACK) {
-            $this->validatePayload($data);
-        } elseif ($this->type === self::TYPE_PHONE_NUMBER) {
-            $this->validatePhoneNumber($data);
-        }
-
-        $this->data = $data;
     }
 
     /**
@@ -55,38 +31,15 @@ class Button implements \JsonSerializable
     }
 
     /**
-     * @return string
-     */
-    public function getTitle()
-    {
-        return $this->title;
-    }
-
-    /**
-     * @return string
-     */
-    public function getData()
-    {
-        return $this->data;
-    }
-
-    /**
      * @inheritdoc
      */
     public function jsonSerialize()
     {
-        $data = [
+        $json = [
             'type' => $this->type,
-            'title' => $this->title,
         ];
 
-        if ($this->type === self::TYPE_WEB_URL) {
-            $data['url'] = $this->data;
-        } else {
-            $data['payload'] = $this->data;
-        }
-
-        return $data;
+        return $json;
     }
 
     /**
@@ -94,7 +47,7 @@ class Button implements \JsonSerializable
      *
      * @throws \InvalidArgumentException
      */
-    private function validateTitleSize($title)
+    public static function validateTitleSize($title)
     {
         if (mb_strlen($title) > 20) {
             throw new \InvalidArgumentException('The button title field should not exceed 20 characters.');
@@ -106,7 +59,7 @@ class Button implements \JsonSerializable
      *
      * @throws \InvalidArgumentException
      */
-    private function validatePayload($payload)
+    public static function validatePayload($payload)
     {
         if (mb_strlen($payload) > 1000) {
             throw new \InvalidArgumentException(sprintf(
@@ -120,7 +73,7 @@ class Button implements \JsonSerializable
      *
      * @throws \InvalidArgumentException
      */
-    private function validatePhoneNumber($phoneNumber)
+    public static function validatePhoneNumber($phoneNumber)
     {
         // Dummy phone number check
         if (strpos($phoneNumber, '+') !== 0) {
