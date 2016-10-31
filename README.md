@@ -188,6 +188,33 @@ $messenger->subscribe();
 
 ```
 
+## Webhook handler
+
+```php
+
+require_once __DIR__.'/vendor/autoload.php';
+
+use Tgallice\FBMessenger\WebhookRequestHandler;
+
+$webookHandler = new WebhookRequestHandler('app_secret');
+
+if (!$webookHandler->isValid()) {
+    ...error
+}
+
+// @see https://developers.facebook.com/docs/messenger-platform/webhook-reference
+// @var CallbackEvent[] $events
+$events = $webookHandler->getAllCallbackEvents();
+
+foreach($events as $event) {
+      var_dump($event->getSenderId());
+      var_dump($event->getRecipientId());
+      var_dump($event->getType());
+}
+
+// you must return a 200 OK HTTP response 
+```
+
 And more other cool things...
 
 ### Todo
