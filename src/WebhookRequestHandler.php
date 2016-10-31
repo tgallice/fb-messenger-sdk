@@ -3,14 +3,14 @@
 namespace Tgallice\FBMessenger;
 
 use GuzzleHttp\Psr7\ServerRequest;
-use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Tgallice\FBMessenger\Callback\CallbackEvent;
 use Tgallice\FBMessenger\Model\Callback\Entry;
 
 class WebhookRequestHandler
 {
     /**
-     * @var RequestInterface
+     * @var ServerRequestInterface
      */
     private $request;
 
@@ -38,9 +38,9 @@ class WebhookRequestHandler
 
     /**
      * @param string $secret
-     * @param RequestInterface|null $request
+     * @param ServerRequestInterface|null $request
      */
-    public function __construct($secret, RequestInterface $request = null)
+    public function __construct($secret, ServerRequestInterface $request = null)
     {
         $this->secret = $secret;
         $this->request = null === $request ? ServerRequest::fromGlobals() : $request;
@@ -88,7 +88,7 @@ class WebhookRequestHandler
     }
 
     /**
-     * @return RequestInterface
+     * @return ServerRequestInterface
      */
     public function getRequest()
     {

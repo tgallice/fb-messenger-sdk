@@ -4,7 +4,7 @@ namespace spec\Tgallice\FBMessenger;
 
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
-use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
 use Tgallice\FBMessenger\Callback\CallbackEvent;
 use Tgallice\FBMessenger\Model\Callback\Entry;
@@ -12,7 +12,7 @@ use Tgallice\FBMessenger\XHubSignature;
 
 class WebhookRequestHandlerSpec extends ObjectBehavior
 {
-    function let(RequestInterface $request, StreamInterface $stream)
+    function let(ServerRequestInterface $request, StreamInterface $stream)
     {
         $payload = '
         {
