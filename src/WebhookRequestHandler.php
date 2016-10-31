@@ -32,6 +32,11 @@ class WebhookRequestHandler
     private $hydratedEntries;
 
     /**
+     * @var string
+     */
+    private $body;
+
+    /**
      * @param string $secret
      * @param RequestInterface|null $request
      */
@@ -99,8 +104,7 @@ class WebhookRequestHandler
             return $this->decodedBody;
         }
 
-        $body = (string) $this->request->getBody();
-        $decoded = @json_decode($body, true);
+        $decoded = @json_decode($this->getBody(), true);
 
         return $this->decodedBody = null === $decoded ? [] : $decoded;
     }
@@ -127,11 +131,27 @@ class WebhookRequestHandler
     }
 
     /**
+     * @return string
+     */
+    private function getBody()
+    {
+        if (isset($this->body )) {
+            return $this->body;
+        }
+
+        // Reset pointer to the beginning
+        $this->request->getBody()->rewind();
+        $this->body = $this->request->getBody()->getContents();
+        $this->request->getBody()->rewind();
+
+        return $this->body;
+    }
+
+    /**
      * @return bool
      */
     private function isValidHeader()
     {
-        $payload = (string) $this->request->getBody();
         $headers = $this->request->getHeader('X-Hub-Signature');
 
         if (empty($headers)) {
@@ -140,6 +160,6 @@ class WebhookRequestHandler
 
         $signature = XHubSignature::parseHeader($headers[0]);
 
-        return XHubSignature::validate($payload, $this->secret, $signature);
+        return XHubSignature::validate($this->getBody(), $this->secret, $signature);
     }
 }

@@ -5,13 +5,14 @@ namespace spec\Tgallice\FBMessenger;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\StreamInterface;
 use Tgallice\FBMessenger\Callback\CallbackEvent;
 use Tgallice\FBMessenger\Model\Callback\Entry;
 use Tgallice\FBMessenger\XHubSignature;
 
 class WebhookRequestHandlerSpec extends ObjectBehavior
 {
-    function let(RequestInterface $request)
+    function let(RequestInterface $request, StreamInterface $stream)
     {
         $payload = '
         {
@@ -44,9 +45,12 @@ class WebhookRequestHandlerSpec extends ObjectBehavior
         } 
         ';
 
+        $stream->rewind()->willReturn(true);
+        $stream->getContents()->willReturn($payload);
+
         $signature = XHubSignature::compute($payload, 'secret');
 
-        $request->getBody()->willReturn($payload);
+        $request->getBody()->willReturn($stream);
         $request->getHeader('X-Hub-Signature')->willReturn(['sha1='.$signature]);
 
         $this->beConstructedWith('secret', $request);
@@ -86,16 +90,16 @@ class WebhookRequestHandlerSpec extends ObjectBehavior
         $this->isValid()->shouldReturn(false);
     }
 
-    function it_check_if_its_a_malformed_callback_request($request)
+    function it_check_if_its_a_malformed_callback_request($stream)
     {
-        $request->getBody()->willReturn('{}');
+        $stream->getContents()->willReturn('{}');
 
         $this->isValid()->shouldReturn(false);
     }
 
-    function it_has_a_decoded_body($request)
+    function it_has_a_decoded_body($stream)
     {
-        $request->getBody()->willReturn('{"test": "value"}');
+        $stream->getContents()->willReturn('{"test": "value"}');
 
         $this->getDecodedBody()->shouldReturn(['test' => 'value']);
     }
