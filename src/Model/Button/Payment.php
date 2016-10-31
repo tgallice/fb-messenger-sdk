@@ -3,8 +3,9 @@
 namespace Tgallice\FBMessenger\Model\Button;
 
 use Tgallice\FBMessenger\Model\Button;
+use Tgallice\FBMessenger\Model\Button\Payment\PaymentSummary;
 
-class Postback extends Button
+class Payment extends Button
 {
     /**
      * @var string
@@ -12,25 +13,26 @@ class Postback extends Button
     private $title;
 
     /**
-     * Payload
-     *
      * @var string
      */
     private $payload;
 
     /**
-     * @param string $title
-     * @param string $payload
+     * @var PaymentSummary
      */
-    public function __construct($title, $payload)
+    private $paymentSummary;
+
+    /**
+     * @param string $payload
+     * @param PaymentSummary $paymentSummary
+     */
+    public function __construct($payload, PaymentSummary $paymentSummary)
     {
-        parent::__construct(Button::TYPE_POSTBACK);
+        parent::__construct(Button::TYPE_PAYMENT);
 
-        self::validateTitleSize($title);
-        $this->title = $title;
-
-        Button::validatePayload($payload);
+        $this->title = 'buy'; // Title must be buy.
         $this->payload = $payload;
+        $this->paymentSummary = $paymentSummary;
     }
 
     /**
@@ -50,6 +52,14 @@ class Postback extends Button
     }
 
     /**
+     * @return PaymentSummary
+     */
+    public function getPaymentSummary()
+    {
+        return $this->paymentSummary;
+    }
+
+    /**
      * @inheritdoc
      */
     public function jsonSerialize()
@@ -57,7 +67,9 @@ class Postback extends Button
         $json = parent::jsonSerialize();
         $json['title'] = $this->title;
         $json['payload'] = $this->payload;
+        $json['payment_summary'] = $this->paymentSummary;
 
         return $json;
     }
+
 }
