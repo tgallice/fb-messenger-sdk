@@ -139,10 +139,7 @@ class WebhookRequestHandler
             return $this->body;
         }
 
-        // Reset pointer to the beginning
-        $this->request->getBody()->rewind();
-        $this->body = $this->request->getBody()->getContents();
-        $this->request->getBody()->rewind();
+        $this->body = (string) $this->request->getBody();
 
         return $this->body;
     }

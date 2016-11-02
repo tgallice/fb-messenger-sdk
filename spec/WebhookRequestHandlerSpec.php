@@ -45,8 +45,7 @@ class WebhookRequestHandlerSpec extends ObjectBehavior
         } 
         ';
 
-        $stream->rewind()->willReturn(true);
-        $stream->getContents()->willReturn($payload);
+        $stream->__toString()->willReturn($payload);
 
         $signature = XHubSignature::compute($payload, 'secret');
 
@@ -92,14 +91,14 @@ class WebhookRequestHandlerSpec extends ObjectBehavior
 
     function it_check_if_its_a_malformed_callback_request($stream)
     {
-        $stream->getContents()->willReturn('{}');
+        $stream->__toString()->willReturn('{}');
 
         $this->isValid()->shouldReturn(false);
     }
 
     function it_has_a_decoded_body($stream)
     {
-        $stream->getContents()->willReturn('{"test": "value"}');
+        $stream->__toString()->willReturn('{"test": "value"}');
 
         $this->getDecodedBody()->shouldReturn(['test' => 'value']);
     }
