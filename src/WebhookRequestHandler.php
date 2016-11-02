@@ -135,7 +135,7 @@ class WebhookRequestHandler
      */
     private function getBody()
     {
-        if (isset($this->body )) {
+        if (isset($this->body)) {
             return $this->body;
         }
 
