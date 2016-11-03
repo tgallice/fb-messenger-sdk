@@ -198,6 +198,17 @@ class MessengerSpec extends ObjectBehavior
         $this->setGreetingText('my text');
     }
 
+    function it_should_delete_greeting_text($client)
+    {
+        $body = [
+            'setting_type' => 'greeting',
+        ];
+
+        $client->send('DELETE', '/me/thread_settings', $body)->shouldBeCalled();
+
+        $this->deleteGreetingText();
+    }
+
     function it_should_define_get_started_button($client)
     {
         $expectedBody = [

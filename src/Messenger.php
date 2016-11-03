@@ -153,6 +153,13 @@ class Messenger
         $this->deleteThreadSettings($setting);
     }
 
+    public function deleteGreetingText()
+    {
+        $setting = $this->buildSetting(ThreadSetting::TYPE_GREETING);
+
+        $this->deleteThreadSettings($setting);
+    }
+
     /**
      * Messenger Factory
      *
