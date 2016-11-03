@@ -10,6 +10,7 @@ class UserProfile
     const LOCALE = 'locale';
     const TIMEZONE = 'timezone';
     const GENDER = 'gender';
+    const PAYMENT_ENABLED = 'is_payment_enabled';
 
     /**
      * @var array
@@ -70,6 +71,14 @@ class UserProfile
     public function getGender()
     {
         return $this->get(self::GENDER);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPaymentEnabled()
+    {
+        return (bool) $this->get(self::PAYMENT_ENABLED);
     }
 
     private function get($index)

@@ -64,6 +64,7 @@ class Messenger
             UserProfile::LOCALE,
             UserProfile::TIMEZONE,
             UserProfile::GENDER,
+            UserProfile::PAYMENT_ENABLED,
         ]
     ) {
         $query = [
