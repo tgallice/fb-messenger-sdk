@@ -18,9 +18,9 @@ $ composer require tgallice/fb-messenger-sdk
 ```
 
 
-## Usage:
+# Usage:
 
-# Create a Messenger instance
+### Create a Messenger instance
 
 ```php
 
@@ -37,7 +37,7 @@ $messenger = Messenger::create('page_token');
 
 ```
 
-# Send a simple text message to a user:
+### Send a simple text message to a user:
 
 
 ```php
@@ -53,7 +53,7 @@ $response = $messenger->sendMessage('<USER_ID>', 'My Message');
 
 ```
 
-# Send a message with quick replies
+### Send a message with quick replies
 
 ```php
 
@@ -75,7 +75,7 @@ $response = $messenger->sendMessage('<USER_ID>', $message);
 
 ```
 
-# Send a more complex message like a `Receipt` message
+### Send a more complex message like a `Receipt` message
 
 ```php
 
@@ -100,7 +100,7 @@ $response = $messenger->sendMessage('<USER_ID>', $receipt);
 
 ```
 
-# Buttons message
+### Buttons message
 
 ```php
 
@@ -123,7 +123,7 @@ $response = $messenger->sendMessage('<USER_ID>', $template);
 
 ```
 
-# Image Message
+### Image Message
 
 
 ```php
@@ -146,9 +146,36 @@ $response = $messenger->sendMessage('<USER_ID>', $image);
 ```
 
 
+## Webhook handler
+
+```php
+
+require_once __DIR__.'/vendor/autoload.php';
+
+use Tgallice\FBMessenger\WebhookRequestHandler;
+
+$webookHandler = new WebhookRequestHandler('app_secret');
+
+if (!$webookHandler->isValid()) {
+    ...error
+}
+
+// @see https://developers.facebook.com/docs/messenger-platform/webhook-reference
+// @var CallbackEvent[] $events
+$events = $webookHandler->getAllCallbackEvents();
+
+foreach($events as $event) {
+      echo $event->getSenderId();
+      echo $event->getRecipientId();
+      echo $event->getType();
+}
+
+// you must return a 200 OK HTTP response 
+```
+
 ## Thread Settings
 
-# Set greeting text
+### Set greeting text
 
 ```php
 
@@ -161,7 +188,7 @@ $messenger->setGreetingText('Tell me what you want.');
 
 ```
 
-# Set started button
+### Set started button
 
 ```php
 
@@ -174,7 +201,7 @@ $messenger->setStartedButton('MY_PLAYLOAD_TO_TRIGGER');
 
 ```
 
-# Set a Persistent Menu
+### Set a Persistent Menu
 
 ```php
 
@@ -197,7 +224,7 @@ $messenger->setPersistentMenu($buttons);
 
 ## Page action
 
-# Subscribe bot to a page
+### Subscribe bot to a page
 
 ```php
 
@@ -208,33 +235,6 @@ use Tgallice\FBMessenger\Messenger;
 $messenger = Messenger::create('page_token');
 $messenger->subscribe();
 
-```
-
-## Webhook handler
-
-```php
-
-require_once __DIR__.'/vendor/autoload.php';
-
-use Tgallice\FBMessenger\WebhookRequestHandler;
-
-$webookHandler = new WebhookRequestHandler('app_secret');
-
-if (!$webookHandler->isValid()) {
-    ...error
-}
-
-// @see https://developers.facebook.com/docs/messenger-platform/webhook-reference
-// @var CallbackEvent[] $events
-$events = $webookHandler->getAllCallbackEvents();
-
-foreach($events as $event) {
-      var_dump($event->getSenderId());
-      var_dump($event->getRecipientId());
-      var_dump($event->getType());
-}
-
-// you must return a 200 OK HTTP response 
 ```
 
 And more other cool things...
