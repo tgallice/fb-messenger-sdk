@@ -91,7 +91,7 @@ class WebhookRequestHandler
      */
     public function isValidCallbackRequest()
     {
-        if (!$this->isValidHeader()) {
+        if (!$this->isValidHubSignature()) {
             return false;
         }
 
@@ -197,7 +197,7 @@ class WebhookRequestHandler
     /**
      * @return bool
      */
-    private function isValidHeader()
+    private function isValidHubSignature()
     {
         $headers = $this->request->getHeader('X-Hub-Signature');
 
