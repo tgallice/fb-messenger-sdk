@@ -52,7 +52,7 @@ class WebhookRequestHandlerSpec extends ObjectBehavior
         $request->getBody()->willReturn($stream);
         $request->getHeader('X-Hub-Signature')->willReturn(['sha1='.$signature]);
 
-        $this->beConstructedWith('secret', $request);
+        $this->beConstructedWith('secret', 'verify_token', $request);
     }
 
     function it_is_initializable()
@@ -79,21 +79,21 @@ class WebhookRequestHandlerSpec extends ObjectBehavior
 
     function it_check_if_its_a_valid_callback_request()
     {
-        $this->isValid()->shouldReturn(true);
+        $this->isValidCallbackRequest()->shouldReturn(true);
     }
 
-    function it_check_if_its_an_invalid_callback_request($request)
+    function it_check_if_it_is_an_invalid_callback_request($request)
     {
         $request->getHeader('X-Hub-Signature')->willReturn(['sha1=bad']);
 
-        $this->isValid()->shouldReturn(false);
+        $this->isValidCallbackRequest()->shouldReturn(false);
     }
 
     function it_check_if_its_a_malformed_callback_request($stream)
     {
         $stream->__toString()->willReturn('{}');
 
-        $this->isValid()->shouldReturn(false);
+        $this->isValidCallbackRequest()->shouldReturn(false);
     }
 
     function it_has_a_decoded_body($stream)
@@ -101,5 +101,23 @@ class WebhookRequestHandlerSpec extends ObjectBehavior
         $stream->__toString()->willReturn('{"test": "value"}');
 
         $this->getDecodedBody()->shouldReturn(['test' => 'value']);
+    }
+
+    function it_check_if_it_is_a_valid_verify_token_request($request)
+    {
+        $request->getMethod()->willReturn('GET');
+        $request->getQueryParams()->willReturn([
+            'hub.verify_token' => 'verify_token',
+        ]);
+        $this->isValidVerifyTokenRequest()->shouldReturn(true);
+    }
+
+    function it_has_a_challenge($request)
+    {
+        $request->getQueryParams()->willReturn([
+            'hub.challenge' => 'challenge',
+        ]);
+
+        $this->getChallenge()->shouldReturn('challenge');
     }
 }

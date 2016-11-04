@@ -37,13 +37,51 @@ class WebhookRequestHandler
     private $body;
 
     /**
+     * @var string
+     */
+    private $verifyToken;
+
+    /**
      * @param string $secret
+     * @param string $verifyToken
      * @param ServerRequestInterface|null $request
      */
-    public function __construct($secret, ServerRequestInterface $request = null)
+    public function __construct($secret, $verifyToken, ServerRequestInterface $request = null)
     {
         $this->secret = $secret;
+        $this->verifyToken = $verifyToken;
         $this->request = null === $request ? ServerRequest::fromGlobals() : $request;
+    }
+
+    /**
+     * Check if the token match with the given verify token.
+     * This is useful in the webhook setup process.
+     *
+     * @return bool
+     */
+    public function isValidVerifyTokenRequest()
+    {
+        if ($this->request->getMethod() !== 'GET') {
+            return false;
+        }
+
+        $params = $this->request->getQueryParams();
+
+        if (!isset($params['hub.verify_token'])) {
+            return false;
+        }
+
+        return  $params['hub.verify_token'] === $this->verifyToken;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getChallenge()
+    {
+        $params = $this->request->getQueryParams();
+
+        return isset($params['hub.challenge']) ? $params['hub.challenge'] : null;
     }
 
     /**
@@ -51,7 +89,7 @@ class WebhookRequestHandler
      *
      * @return bool
      */
-    public function isValid()
+    public function isValidCallbackRequest()
     {
         if (!$this->isValidHeader()) {
             return false;
@@ -63,6 +101,18 @@ class WebhookRequestHandler
         $entry = isset($decoded['entry']) ? $decoded['entry'] : null;
 
         return $object === 'page' && null !== $entry;
+    }
+
+    /**
+     * Check if the request is a valid webhook request
+     *
+     * @deprecated use WebhookRequestHandler::isValidCallbackRequest() instead
+     *
+     * @return bool
+     */
+    public function isValid()
+    {
+        return $this->isValidCallbackRequest();
     }
 
     /**
