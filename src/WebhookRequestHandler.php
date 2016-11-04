@@ -2,10 +2,12 @@
 
 namespace Tgallice\FBMessenger;
 
+use Tgallice\FBMessenger\Exception\ApiException;
 use GuzzleHttp\Psr7\ServerRequest;
 use Psr\Http\Message\ServerRequestInterface;
 use Tgallice\FBMessenger\Callback\CallbackEvent;
 use Tgallice\FBMessenger\Model\Callback\Entry;
+use Tgallice\FBMessenger\Postback\PostbackCommand;
 
 class WebhookRequestHandler
 {
@@ -42,12 +44,23 @@ class WebhookRequestHandler
     private $verifyToken;
 
     /**
+     * @var PostbackCommand[]
+     */
+    private $postbackcommands = [];
+
+    /**
+     * @var Messenger
+     */
+    private $messenger;
+
+    /**
      * @param string $secret
      * @param string $verifyToken
      * @param ServerRequestInterface|null $request
      */
-    public function __construct($secret, $verifyToken, ServerRequestInterface $request = null)
+    public function __construct($messenger, $secret, $verifyToken, ServerRequestInterface $request = null)
     {
+        $this->messenger = $messenger;
         $this->secret = $secret;
         $this->verifyToken = $verifyToken;
         $this->request = null === $request ? ServerRequest::fromGlobals() : $request;
@@ -124,6 +137,15 @@ class WebhookRequestHandler
 
         foreach ($this->getHydratedEntries() as $hydratedEntry) {
             $events = array_merge($events, $hydratedEntry->getCallbackEvents());
+        }
+
+        /**
+         * This codes is the magic that launch a PostbackCommand
+         */
+        foreach ($events as $event) {
+            if ($event->getType() === 'postback_event') {
+                $this->postbackcommands[$event->getPostback()->getPayload()]->initialize($this->messenger, $event);
+            }
         }
 
         return $events;
@@ -208,5 +230,64 @@ class WebhookRequestHandler
         $signature = XHubSignature::parseHeader($headers[0]);
 
         return XHubSignature::validate($this->getBody(), $this->secret, $signature);
+    }
+
+    /**
+     * Array of Postback
+     *
+     * @return PostbackCommand[]
+     */
+    public function getPostbackCommands()
+    {
+        return $this->postbackcommands;
+    }
+
+    /**
+     * Add a new postback
+     *
+     * @param PostbackCommand $postback
+     * @return $this
+     */
+    public function addPostbackCommand($postback)
+    {
+        $postback = new $postback();
+
+        if (!is_object($postback)) {
+            if (!class_exists($postback)) {
+                throw new ApiException(
+                    sprintf('Class "%s" not found!.', $postback)
+                );
+            }
+        }
+
+        if ($postback instanceof PostbackCommand) {
+
+            /*
+             * The postback is valid.
+             * Add it to the list
+             *
+             * @var Postback $postback
+             */
+            $this->postbackcommands[$postback->getName()] = $postback;
+
+            return $this;
+        }
+
+        throw new ApiException(
+            sprintf(
+                'Class "%s" have to be an instance of "Tgallice\FBMessenger\Postback\PostbackCommand"',
+                get_class($postback)
+            )
+        );
+    }
+
+    /**
+     * Remove a postback;
+     *
+     * @param string $name
+     */
+    public function removePostbackCommand($name)
+    {
+        unset($this->postbackcommands[$name]);
     }
 }
