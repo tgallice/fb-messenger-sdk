@@ -6,6 +6,8 @@ use Tgallice\FBMessenger\Model\Callback\MessageEcho;
 
 class MessageEchoEvent extends CallbackEvent
 {
+    const TYPE = 'message_echo_event';
+
     /**
      * @var int
      */
@@ -50,6 +52,6 @@ class MessageEchoEvent extends CallbackEvent
      */
     public function getType()
     {
-        return 'message_echo_event';
+        return self::TYPE;
     }
 }

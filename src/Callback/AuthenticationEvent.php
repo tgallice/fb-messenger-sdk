@@ -6,6 +6,8 @@ use Tgallice\FBMessenger\Model\Callback\Optin;
 
 class AuthenticationEvent extends CallbackEvent
 {
+    const TYPE = 'authentication_event';
+
     /**
      * @var int
      */
@@ -50,6 +52,6 @@ class AuthenticationEvent extends CallbackEvent
      */
     public function getType()
     {
-        return 'authentication_event';
+        return self::TYPE;
     }
 }

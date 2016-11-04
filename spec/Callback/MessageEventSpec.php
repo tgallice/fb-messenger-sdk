@@ -43,6 +43,18 @@ class MessageEventSpec extends ObjectBehavior
         $this->getMessage()->shouldReturn($message);
     }
 
+    function it_can_check_if_it_is_a_quick_reply($message)
+    {
+        $message->hasQuickReply()->willReturn(true);
+        $this->isQuickReply()->shouldReturn(true);
+    }
+
+    function it_has_a_quick_reply_payload($message)
+    {
+        $message->getQuickReply()->willReturn('quick_reply');
+        $this->getQuickReplyPayload()->shouldReturn('quick_reply');
+    }
+
     function it_has_a_type()
     {
         $this->getType()->shouldReturn('message_event');
