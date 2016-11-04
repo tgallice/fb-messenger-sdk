@@ -2,21 +2,19 @@
 
 namespace spec\Tgallice\FBMessenger;
 
-use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\RequestOptions;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Psr\Http\Message\ResponseInterface;
 use Tgallice\FBMessenger\Client;
-use Tgallice\FBMessenger\Exception\ApiException;
 use Tgallice\FBMessenger\Model\Attachment;
 use Tgallice\FBMessenger\Model\Attachment\Template;
+use Tgallice\FBMessenger\Model\Button;
+use Tgallice\FBMessenger\Model\Button\Postback;
+use Tgallice\FBMessenger\Model\Button\WebUrl;
 use Tgallice\FBMessenger\Model\Message;
 use Tgallice\FBMessenger\Model\MessageResponse;
 use Tgallice\FBMessenger\Model\ThreadSetting;
-use Tgallice\FBMessenger\Model\ThreadSetting\MenuItem;
-use Tgallice\FBMessenger\Model\ThreadSetting\Postback;
-use Tgallice\FBMessenger\Model\ThreadSetting\WebUrl;
 use Tgallice\FBMessenger\Model\UserProfile;
 use Tgallice\FBMessenger\NotificationType;
 
@@ -263,11 +261,11 @@ class MessengerSpec extends ObjectBehavior
         ]);
     }
 
-    function it_should_not_add_more_than_5_menu_item(MenuItem $menuItem)
+    function it_should_not_add_more_than_5_menu_buttons(Button $menuButton)
     {
         $exception = new \InvalidArgumentException('You should not set more than 5 menu items.');
         $this->shouldThrow($exception)->duringSetPersistentMenu([
-            $menuItem, $menuItem, $menuItem, $menuItem, $menuItem, $menuItem
+            $menuButton, $menuButton, $menuButton, $menuButton, $menuButton, $menuButton
         ]);
     }
 
