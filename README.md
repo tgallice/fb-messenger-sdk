@@ -53,6 +53,28 @@ $response = $messenger->sendMessage('<USER_ID>', 'My Message');
 
 ```
 
+# Send a message with quick replies
+
+```php
+
+require_once __DIR__.'/vendor/autoload.php';
+
+use Tgallice\FBMessenger\Messenger;
+use Tgallice\FBMessenger\Model\Message;
+use Tgallice\FBMessenger\Model\QuickReply;
+
+$messenger = Messenger::create('page_token');
+
+$message = new Message('What do you like ?');
+$message->setQuickReplies([
+    new QuickReply('Apple', 'LIKE_APPLE_PAYLOAD'),
+    new QuickReply('Peach', 'LIKE_PEACH_PAYLOAD')
+]);
+
+$response = $messenger->sendMessage('<USER_ID>', $message);
+
+```
+
 # Send a more complex message like a `Receipt` message
 
 ```php
