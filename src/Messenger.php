@@ -5,12 +5,12 @@ namespace Tgallice\FBMessenger;
 use Tgallice\FBMessenger\Exception\ApiException;
 use Tgallice\FBMessenger\Model\Attachment;
 use Tgallice\FBMessenger\Model\Attachment\Template;
+use Tgallice\FBMessenger\Model\Button;
 use Tgallice\FBMessenger\Model\Message;
 use Tgallice\FBMessenger\Model\MessageResponse;
 use Tgallice\FBMessenger\Model\ThreadSetting;
 use Tgallice\FBMessenger\Model\ThreadSetting\GreetingText;
 use Tgallice\FBMessenger\Model\ThreadSetting\StartedButton;
-use Tgallice\FBMessenger\Model\ThreadSetting\MenuItem;
 use Tgallice\FBMessenger\Model\UserProfile;
 
 class Messenger
@@ -127,18 +127,18 @@ class Messenger
     }
 
     /**
-     * @param MenuItem[] $menuItems
+     * @param Button[] $menuButtons
      */
-    public function setPersistentMenu(array $menuItems)
+    public function setPersistentMenu(array $menuButtons)
     {
-        if (count($menuItems) > 5) {
+        if (count($menuButtons) > 5) {
             throw new \InvalidArgumentException('You should not set more than 5 menu items.');
         }
 
         $setting = $this->buildSetting(
             ThreadSetting::TYPE_CALL_TO_ACTIONS,
             ThreadSetting::EXISTING_THREAD,
-            $menuItems
+            $menuButtons
         );
 
         $this->postThreadSettings($setting);
