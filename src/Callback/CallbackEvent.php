@@ -2,9 +2,7 @@
 
 namespace Tgallice\FBMessenger\Callback;
 
-use Symfony\Component\EventDispatcher\Event;
-
-abstract class CallbackEvent extends Event
+abstract class CallbackEvent
 {
     private $senderId;
     private $recipientId;

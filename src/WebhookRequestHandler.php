@@ -6,13 +6,8 @@ use Tgallice\FBMessenger\Exception\ApiException;
 use GuzzleHttp\Psr7\ServerRequest;
 use Psr\Http\Message\ServerRequestInterface;
 use Tgallice\FBMessenger\Callback\CallbackEvent;
-use Tgallice\FBMessenger\Callback\PostbackEvent;
 use Tgallice\FBMessenger\Model\Callback\Entry;
-use Tgallice\FBMessenger\Model\Message;
 use Tgallice\FBMessenger\Postback\PostbackCommand;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 
 class WebhookRequestHandler
 {
@@ -48,12 +43,6 @@ class WebhookRequestHandler
      */
     private $verifyToken;
 
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
     /**
      * @var PostbackCommand[]
      */
@@ -65,38 +54,16 @@ class WebhookRequestHandler
     private $messenger;
 
     /**
-     * @param Messenger $messenger
      * @param string $secret
      * @param string $verifyToken
      * @param ServerRequestInterface|null $request
-     * @param EventDispatcherInterface $dispatcher
      */
-    public function __construct($messenger, $secret, $verifyToken, ServerRequestInterface $request = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct($messenger, $secret, $verifyToken, ServerRequestInterface $request = null)
     {
         $this->messenger = $messenger;
         $this->secret = $secret;
         $this->verifyToken = $verifyToken;
         $this->request = null === $request ? ServerRequest::fromGlobals() : $request;
-        $this->dispatcher = $dispatcher ? new EventDispatcher(): $dispatcher;
-    }
-
-
-    public function dispatchCallbackEvents()
-    {
-        foreach ($this->getAllCallbackEvents() as $event) {
-            // Dispatch callback event based on the CallbackEvent::NAME
-            $this->dispatcher->dispatch($event->getName(), $event);
-
-            if ($event instanceof PostbackEvent) {
-                // Dispatch postback payload event
-                $this->dispatcher->dispatch($event->getPostback(), $event);
-            }
-
-            if ($event instanceof Message && $event->hasQuickReply()) {
-                // Dispatch quick reply payload event
-                $this->dispatcher->dispatch($event->getQuickReplyPayload(), $event);
-            }
-        }
     }
 
     /**
