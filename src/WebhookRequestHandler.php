@@ -84,7 +84,7 @@ class WebhookRequestHandler
             return false;
         }
 
-        return $params['hub.verify_token'] === $this->verifyToken;
+        return  $params['hub.verify_token'] === $this->verifyToken;
     }
 
     /**
@@ -144,10 +144,7 @@ class WebhookRequestHandler
          */
         foreach ($events as $event) {
             if ($event->getType() === 'postback_event') {
-
-                if (array_key_exists($event->getPostback()->getPayload(), $this->postbackcommands)) {
-                    $this->postbackcommands[$event->getPostback()->getPayload()]->initialize($this->messenger, $event);
-                }
+                $this->postbackcommands[$event->getPostback()->getPayload()]->initialize($this->messenger, $event);
             }
         }
 
@@ -214,7 +211,7 @@ class WebhookRequestHandler
             return $this->body;
         }
 
-        $this->body = (string)$this->request->getBody();
+        $this->body = (string) $this->request->getBody();
 
         return $this->body;
     }
