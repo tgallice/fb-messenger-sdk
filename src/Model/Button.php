@@ -9,6 +9,7 @@ abstract class Button implements \JsonSerializable
     const TYPE_WEB_URL = 'web_url';
     const TYPE_SHARE = 'element_share';
     const TYPE_PAYMENT = 'payment';
+    const TYPE_ACCOUNT_LINK = 'account_link';
 
     /**
      * @var string
