@@ -6,13 +6,16 @@ use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Tgallice\FBMessenger\Callback\CallbackEvent;
+use Tgallice\FBMessenger\Callback\MessageEvent;
 use Tgallice\FBMessenger\Model\Callback\Entry;
 use Tgallice\FBMessenger\XHubSignature;
 
 class WebhookRequestHandlerSpec extends ObjectBehavior
 {
-    function let(ServerRequestInterface $request, StreamInterface $stream)
+    function let(ServerRequestInterface $request, StreamInterface $stream, EventDispatcherInterface $dispatcher)
     {
         $payload = '
         {
@@ -52,7 +55,7 @@ class WebhookRequestHandlerSpec extends ObjectBehavior
         $request->getBody()->willReturn($stream);
         $request->getHeader('X-Hub-Signature')->willReturn(['sha1='.$signature]);
 
-        $this->beConstructedWith('secret', 'verify_token', $request);
+        $this->beConstructedWith('secret', 'verify_token', $request, $dispatcher);
     }
 
     function it_is_initializable()
@@ -119,5 +122,18 @@ class WebhookRequestHandlerSpec extends ObjectBehavior
         ]);
 
         $this->getChallenge()->shouldReturn('challenge');
+    }
+
+    function it_dispatch_events($dispatcher)
+    {
+        $dispatcher->dispatch(MessageEvent::NAME, Argument::type(MessageEvent::class))->shouldBeCalled();
+        $dispatcher->dispatch('DEVELOPER_DEFINED_PAYLOAD', Argument::type(MessageEvent::class))->shouldBeCalled();
+        $this->dispatchCallbackEvents();
+    }
+
+    function it_add_event_subscriber($dispatcher, EventSubscriberInterface $subscriber)
+    {
+        $dispatcher->addSubscriber($subscriber)->shouldBeCalled();
+        $this->addEventSubscriber($subscriber);
     }
 }

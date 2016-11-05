@@ -4,7 +4,12 @@ namespace Tgallice\FBMessenger;
 
 use GuzzleHttp\Psr7\ServerRequest;
 use Psr\Http\Message\ServerRequestInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Tgallice\FBMessenger\Callback\CallbackEvent;
+use Tgallice\FBMessenger\Callback\MessageEvent;
+use Tgallice\FBMessenger\Callback\PostbackEvent;
 use Tgallice\FBMessenger\Model\Callback\Entry;
 
 class WebhookRequestHandler
@@ -42,15 +47,21 @@ class WebhookRequestHandler
     private $verifyToken;
 
     /**
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    /**
      * @param string $secret
      * @param string $verifyToken
      * @param ServerRequestInterface|null $request
      */
-    public function __construct($secret, $verifyToken, ServerRequestInterface $request = null)
+    public function __construct($secret, $verifyToken, ServerRequestInterface $request = null, EventDispatcherInterface $dispatcher = null)
     {
         $this->secret = $secret;
         $this->verifyToken = $verifyToken;
-        $this->request = null === $request ? ServerRequest::fromGlobals() : $request;
+        $this->request = $request ?: ServerRequest::fromGlobals();
+        $this->dispatcher = $dispatcher ?: new EventDispatcher();
     }
 
     /**
@@ -157,6 +168,34 @@ class WebhookRequestHandler
         $decoded = @json_decode($this->getBody(), true);
 
         return $this->decodedBody = null === $decoded ? [] : $decoded;
+    }
+
+    /**
+     * Dispatch events to listeners
+     */
+    public function dispatchCallbackEvents()
+    {
+        foreach ($this->getAllCallbackEvents() as $event) {
+            $this->dispatcher->dispatch($event->getName(), $event);
+
+            if ($event instanceof PostbackEvent) {
+                // Dispatch postback payload
+                $this->dispatcher->dispatch($event->getPostback(), $event);
+            }
+
+            if ($event instanceof MessageEvent && $event->isQuickReply()) {
+                // Dispatch quick reply payload
+                $this->dispatcher->dispatch($event->getQuickReplyPayload(), $event);
+            }
+        }
+    }
+
+    /**
+     * @param EventSubscriberInterface $subscriber
+     */
+    public function addEventSubscriber(EventSubscriberInterface $subscriber)
+    {
+        $this->dispatcher->addSubscriber($subscriber);
     }
 
     /**
