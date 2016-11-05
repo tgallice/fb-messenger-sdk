@@ -6,6 +6,8 @@ use Tgallice\FBMessenger\Model\Callback\Message;
 
 class MessageEvent extends CallbackEvent
 {
+    const NAME = 'message_event';
+
     /**
      * @var int
      */
@@ -45,10 +47,26 @@ class MessageEvent extends CallbackEvent
     }
 
     /**
+     * @return bool
+     */
+    public  function isQuickReply()
+    {
+        return $this->message->hasQuickReply();
+    }
+
+    /**
+     * @return null|string
+     */
+    public  function getQuickReplyPayload()
+    {
+        return $this->message->getQuickReply();
+    }
+
+    /**
      * @return string
      */
-    public function getType()
+    public function getName()
     {
-        return 'message_event';
+        return self::NAME;
     }
 }

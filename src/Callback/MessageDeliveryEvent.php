@@ -6,6 +6,8 @@ use Tgallice\FBMessenger\Model\Callback\Delivery;
 
 class MessageDeliveryEvent extends CallbackEvent
 {
+    const NAME = 'message_delivery_event';
+
     /**
      * @var Delivery
      */
@@ -33,8 +35,8 @@ class MessageDeliveryEvent extends CallbackEvent
     /**
      * @return string
      */
-    public function getType()
+    public function getName()
     {
-        return 'message_delivery_event';
+        return self::NAME;
     }
 }

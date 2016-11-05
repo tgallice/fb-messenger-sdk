@@ -4,6 +4,8 @@ namespace Tgallice\FBMessenger\Callback;
 
 class RawEvent extends CallbackEvent
 {
+    const NAME = 'raw_event';
+
     /**
      * @var array
      */
@@ -48,8 +50,8 @@ class RawEvent extends CallbackEvent
     /**
      * @return string
      */
-    public function getType()
+    public function getName()
     {
-        return 'raw_event';
+        return self::NAME;
     }
 }

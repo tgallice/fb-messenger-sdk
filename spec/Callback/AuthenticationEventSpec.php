@@ -37,8 +37,8 @@ class AuthenticationEventSpec extends ObjectBehavior
         $this->getOptin()->shouldReturn($optin);
     }
 
-    function it_has_a_type()
+    function it_has_a_name()
     {
-        $this->getType()->shouldReturn('authentication_event');
+        $this->getName()->shouldReturn('authentication_event');
     }
 }

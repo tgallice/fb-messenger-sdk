@@ -38,8 +38,8 @@ class MessageReadEventSpec extends ObjectBehavior
         $this->getRead()->shouldReturn($read);
     }
 
-    function it_has_a_type()
+    function it_has_a_name()
     {
-        $this->getType()->shouldReturn('message_read_event');
+        $this->getName()->shouldReturn('message_read_event');
     }
 }

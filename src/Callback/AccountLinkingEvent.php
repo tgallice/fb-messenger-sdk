@@ -6,6 +6,8 @@ use Tgallice\FBMessenger\Model\Callback\AccountLinking;
 
 class AccountLinkingEvent extends CallbackEvent
 {
+    const NAME = 'account_linking_event';
+
     /**
      * @var int
      */
@@ -48,8 +50,8 @@ class AccountLinkingEvent extends CallbackEvent
     /**
      * @return string
      */
-    public function getType()
+    public function getName()
     {
-        return 'account_linking_event';
+        return self::NAME;
     }
 }

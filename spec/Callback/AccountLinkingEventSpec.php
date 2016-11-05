@@ -36,8 +36,8 @@ class AccountLinkingEventSpec extends ObjectBehavior
         $this->getAccountLinking()->shouldReturn($accountLinking);
     }
 
-    function it_has_a_type()
+    function it_has_a_name()
     {
-        $this->getType()->shouldReturn('account_linking_event');
+        $this->getName()->shouldReturn('account_linking_event');
     }
 }

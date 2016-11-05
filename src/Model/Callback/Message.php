@@ -110,6 +110,14 @@ class Message
     }
 
     /**
+     * @return bool
+     */
+    public function hasLocation()
+    {
+        return $this->hasAttachments() && $this->attachments[0]['type'] === 'location';
+    }
+
+    /**
      * @param array $payload
      *
      * @return static
