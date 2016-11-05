@@ -31,9 +31,9 @@ class RawEventSpec extends ObjectBehavior
         $this->getRecipientId()->shouldReturn('recipient_id');
     }
 
-    function it_has_a_type()
+    function it_has_a_name()
     {
-        $this->getType()->shouldReturn('raw_event');
+        $this->getName()->shouldReturn('raw_event');
     }
 
     function it_has_a_raw_event_data()

@@ -36,5 +36,5 @@ abstract class CallbackEvent
     /**
      * @return string
      */
-    abstract public function getType();
+    abstract public function getName();
 }

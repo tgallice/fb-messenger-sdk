@@ -6,7 +6,7 @@ use Tgallice\FBMessenger\Model\Callback\Postback;
 
 class PostbackEvent extends CallbackEvent
 {
-    const TYPE = 'postback_event';
+    const NAME = 'postback_event';
 
     /**
      * @var int
@@ -48,8 +48,8 @@ class PostbackEvent extends CallbackEvent
     /**
      * @return string
      */
-    public function getType()
+    public function getName()
     {
-        return self::TYPE;
+        return self::NAME;
     }
 }

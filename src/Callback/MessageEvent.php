@@ -6,7 +6,7 @@ use Tgallice\FBMessenger\Model\Callback\Message;
 
 class MessageEvent extends CallbackEvent
 {
-    const TYPE = 'message_event';
+    const NAME = 'message_event';
 
     /**
      * @var int
@@ -65,8 +65,8 @@ class MessageEvent extends CallbackEvent
     /**
      * @return string
      */
-    public function getType()
+    public function getName()
     {
-        return self::TYPE;
+        return self::NAME;
     }
 }

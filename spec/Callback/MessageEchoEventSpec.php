@@ -43,8 +43,8 @@ class MessageEchoEventSpec extends ObjectBehavior
         $this->getMessageEcho()->shouldReturn($messageEcho);
     }
 
-    function it_has_a_type()
+    function it_has_a_name()
     {
-        $this->getType()->shouldReturn('message_echo_event');
+        $this->getName()->shouldReturn('message_echo_event');
     }
 }

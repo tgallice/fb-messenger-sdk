@@ -55,8 +55,8 @@ class MessageEventSpec extends ObjectBehavior
         $this->getQuickReplyPayload()->shouldReturn('quick_reply');
     }
 
-    function it_has_a_type()
+    function it_has_a_name()
     {
-        $this->getType()->shouldReturn('message_event');
+        $this->getName()->shouldReturn('message_event');
     }
 }
