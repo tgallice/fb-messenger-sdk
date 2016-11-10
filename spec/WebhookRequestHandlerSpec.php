@@ -107,7 +107,7 @@ class WebhookRequestHandlerSpec extends ObjectBehavior
     {
         $request->getMethod()->willReturn('GET');
         $request->getQueryParams()->willReturn([
-            'hub.verify_token' => 'verify_token',
+            'hub_verify_token' => 'verify_token',
         ]);
         $this->isValidVerifyTokenRequest()->shouldReturn(true);
     }
@@ -115,7 +115,7 @@ class WebhookRequestHandlerSpec extends ObjectBehavior
     function it_has_a_challenge($request)
     {
         $request->getQueryParams()->willReturn([
-            'hub.challenge' => 'challenge',
+            'hub_challenge' => 'challenge',
         ]);
 
         $this->getChallenge()->shouldReturn('challenge');
