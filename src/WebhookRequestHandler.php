@@ -67,11 +67,11 @@ class WebhookRequestHandler
 
         $params = $this->request->getQueryParams();
 
-        if (!isset($params['hub.verify_token'])) {
+        if (!isset($params['hub_verify_token'])) {
             return false;
         }
 
-        return  $params['hub.verify_token'] === $this->verifyToken;
+        return  $params['hub_verify_token'] === $this->verifyToken;
     }
 
     /**
@@ -81,7 +81,7 @@ class WebhookRequestHandler
     {
         $params = $this->request->getQueryParams();
 
-        return isset($params['hub.challenge']) ? $params['hub.challenge'] : null;
+        return isset($params['hub_challenge']) ? $params['hub_challenge'] : null;
     }
 
     /**
