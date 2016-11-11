@@ -43,6 +43,12 @@ class MessageEventSpec extends ObjectBehavior
         $this->getMessage()->shouldReturn($message);
     }
 
+    function it_has_a_message_text($message)
+    {
+        $message->getText()->willReturn('text');
+        $this->getMessageText()->shouldReturn('text');
+    }
+
     function it_can_check_if_it_is_a_quick_reply($message)
     {
         $message->hasQuickReply()->willReturn(true);
