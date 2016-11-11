@@ -146,7 +146,12 @@ $response = $messenger->sendMessage('<USER_ID>', $image);
 ```
 
 
-## Webhook handler
+## Webhook setup
+
+When you setup a `Callback URL` in your app, Facebook need to validate this entry point.
+In this process you must define a `Verify Token`
+Your job is to compare the received verify token and the one you setup them return the challenge given.
+Here is how to easily handle the whole process:
 
 ```php
 
@@ -154,9 +159,69 @@ require_once __DIR__.'/vendor/autoload.php';
 
 use Tgallice\FBMessenger\WebhookRequestHandler;
 
-$webookHandler = new WebhookRequestHandler('app_secret');
+$webookHandler = new WebhookRequestHandler('app_secret', 'verify_token');
+// The Request is internally retrieve but you can set your own if you have already a Request object.
+// $webookHandler = new WebhookRequestHandler('app_secret', 'verify_token', $request);
 
-if (!$webookHandler->isValid()) {
+
+if (!$webookHandler->isValidVerifyTokenRequest()) {
+    ...error
+}
+
+// you must return a 200 OK HTTP response 
+header("HTTP/1.1 200 OK");
+
+echo $webookHandler->getChallenge();
+```
+
+## Webhook listening
+
+We assume that we receive this payload from Facebook:
+```json
+{
+  "object": "page",
+  "entry": [
+    {
+      "id": "PAGE_ID",
+      "time": 1473204787206,
+      "messaging": [
+        {
+          "sender":{
+            "id":"USER_ID"
+          },
+          "recipient":{
+            "id":"PAGE_ID"
+          },
+          "timestamp":1458692752478,
+          "message":{
+            "mid":"mid.1457764197618:41d102a3e1ae206a38",
+            "seq":73,
+            "text":"hello, world!",
+            "quick_reply": {
+              "payload": "DEVELOPER_DEFINED_PAYLOAD"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+
+```
+
+### Basic usage
+
+```php
+
+require_once __DIR__.'/vendor/autoload.php';
+
+use Tgallice\FBMessenger\WebhookRequestHandler;
+
+$webookHandler = new WebhookRequestHandler('app_secret', 'verify_token');
+// The Request is internally retrieve but you can set your own if you have already a Request object.
+// $webookHandler = new WebhookRequestHandler('app_secret', 'verify_token', $request);
+
+if (!$webookHandler->isValidCallbackRequest()) {
     ...error
 }
 
@@ -165,10 +230,70 @@ if (!$webookHandler->isValid()) {
 $events = $webookHandler->getAllCallbackEvents();
 
 foreach($events as $event) {
-      echo $event->getSenderId();
-      echo $event->getRecipientId();
-      echo $event->getType();
+    if ($event instanceof MessageEvent) {
+          echo $event->getMessageText()."\n";
+          echo $event->getQuickReplyPayload()."\n";
+    }
 }
+
+// Result:
+//
+// hello, world!
+// DEVELOPER_DEFINED_PAYLOAD
+
+// you must return a 200 OK HTTP response 
+```
+
+### Advanced usage
+
+```php
+
+require_once __DIR__.'/vendor/autoload.php';
+
+use Tgallice\FBMessenger\WebhookRequestHandler;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Tgallice\FBMessenger\Callback\MessageEvent;
+
+// We use the symfony/event-dispatcher package
+// @see https://github.com/symfony/event-dispatcher for more details
+// Create custom event listener
+class MessageEventListener implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents()
+    {
+        return [
+            MessageEvent::NAME => 'onMessageEvent',
+            'DEVELOPER_DEFINED_PAYLOAD' => 'onQuickReply',
+        ];
+    }
+
+    public function onMessageEvent(MessageEvent $event)
+    {
+        prin(__METHOD__."\n");
+    }
+
+    public function onQuickReply(MessageEvent $event)
+    {
+        prin(__METHOD__."\n");
+    }
+}
+
+$webhookHandler = new WebhookRequestHandler('app_secret', 'verify_token');
+
+// Register the listener
+$webhook->addEventSubscriber(new MessageEventListener());
+
+if (!$webookHandler->isValidCallbackRequest()) {
+    ...error
+}
+
+$webhook->dispatchCallbackEvents();
+
+// Result:
+//
+// MessageEventListener::onMessageEvent
+// MessageEventListener::onQuickReply
+
 
 // you must return a 200 OK HTTP response 
 ```
