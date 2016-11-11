@@ -8,9 +8,11 @@ filter:
         - src/*
 
 build:
+    cache:
+        disabled: true
     dependencies:
         before:
-            - composer require "henrikbjorn/phpspec-code-coverage" "^2.0"
+            - composer require henrikbjorn/phpspec-code-coverage:2.1
     environment:
         php:
             version: 5.5
