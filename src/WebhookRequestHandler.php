@@ -180,7 +180,7 @@ class WebhookRequestHandler
 
             if ($event instanceof PostbackEvent) {
                 // Dispatch postback payload
-                $this->dispatcher->dispatch($event->getPostback(), $event);
+                $this->dispatcher->dispatch($event->getPostback()->getPayload(), $event);
             }
 
             if ($event instanceof MessageEvent && $event->isQuickReply()) {

@@ -48,6 +48,14 @@ class PostbackEvent extends CallbackEvent
     /**
      * @return string
      */
+    public function getPostbackPayload()
+    {
+        return $this->postback->getPayload();
+    }
+
+    /**
+     * @return string
+     */
     public function getName()
     {
         return self::NAME;
