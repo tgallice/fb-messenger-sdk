@@ -46,4 +46,10 @@ class PostbackEventSpec extends ObjectBehavior
     {
         $this->getName()->shouldReturn('postback_event');
     }
+
+    function it_has_a_postback_payload($postback)
+    {
+        $postback->getPayload()->willReturn('payload');
+        $this->getPostbackPayload()->shouldReturn('payload');
+    }
 }

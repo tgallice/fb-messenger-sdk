@@ -47,6 +47,14 @@ class MessageEvent extends CallbackEvent
     }
 
     /**
+     * @return null|string
+     */
+    public function getMessageText()
+    {
+        return $this->message->getText();
+    }
+
+    /**
      * @return bool
      */
     public  function isQuickReply()
