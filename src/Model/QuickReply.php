@@ -2,73 +2,65 @@
 
 namespace Tgallice\FBMessenger\Model;
 
-class QuickReply implements \JsonSerializable
+abstract class QuickReply implements \JsonSerializable
 {
+    const TYPE_TEXT = 'text';
+    const TYPE_LOCATION = 'location';
+    
     /**
      * @var string
      */
-    private $title;
+    private $type;
 
     /**
-     * @var string
+     * @param string $type
      */
-    private $payload;
-
-    /**
-     * @var string
-     */
-    private $contentType = 'text';
-
-    /**
-     * @param string $title
-     * @param string $payload
-     */
-    public function __construct($title, $payload)
+    public function __construct($type)
     {
-        if (empty($title) || mb_strlen($title) > 20) {
-            throw new \InvalidArgumentException('$title should not exceed 20 characters.');
-        }
-        if (empty($payload) || mb_strlen($payload) > 1000) {
-            throw new \InvalidArgumentException('$payload should not exceed 1000 characters.');
-        }
-
-        $this->title = $title;
-        $this->payload = $payload;
+        $this->type = $type;
     }
 
     /**
      * @return string
      */
-    public function getContentType()
+    public function getType()
     {
-        return $this->contentType;
+        return $this->type;
     }
-
-    /**
-     * @return string
-     */
-    public function getTitle()
-    {
-        return $this->title;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPayload()
-    {
-        return $this->payload;
-    }
-
+    
     /**
      * @inheritdoc
      */
     public function jsonSerialize()
     {
-        return [
-            'title' => $this->title,
-            'payload' => $this->payload,
-            'content_type' => $this->contentType,
+        $json = [
+            'type' => $this->type,
         ];
+
+        return $json;
+    }
+    
+    /**
+     * @param string $title
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function validateTitleSize($title)
+    {
+        if (mb_strlen($title) > 20) {
+            throw new \InvalidArgumentException('The button title field should not exceed 20 characters.');
+        }
+    }
+    
+    /**
+     * @param $payload
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function validatePayload($payload)
+    {
+        if (mb_strlen($payload) > 1000) {
+            throw new \InvalidArgumentException(sprintf('Payload should not exceed 1000 characters.', $payload));
+        }
     }
 }
