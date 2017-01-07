@@ -4,12 +4,13 @@ namespace spec\Tgallice\FBMessenger\Model\Attachment\Template\Generic;
 
 use PhpSpec\ObjectBehavior;
 use Tgallice\FBMessenger\Model\Button;
+use Tgallice\FBMessenger\Model\DefaultAction;
 
 class ElementSpec extends ObjectBehavior
 {
-    function let(Button $button)
+    function let(Button $button, DefaultAction $defaultAction)
     {
-        $this->beConstructedWith('title', 'subtitle', 'image_url', 'item_url', [$button]);
+        $this->beConstructedWith('title', 'subtitle', 'image_url', [$button], $defaultAction);
     }
 
     function it_is_initializable()
@@ -27,14 +28,14 @@ class ElementSpec extends ObjectBehavior
         $this->getImageUrl()->shouldReturn('image_url');
     }
 
-    function it_should_return_the_item_url()
-    {
-        $this->getItemUrl()->shouldReturn('item_url');
-    }
-
     function it_should_return_the_buttons($button)
     {
         $this->getButtons()->shouldReturn([$button]);
+    }
+
+    function it_should_return_the_default_action($defaultAction)
+    {
+        $this->getDefaultAction()->shouldReturn($defaultAction);
     }
 
     function it_throws_exception_when_the_subtitle_exceed_80_characters()
@@ -47,7 +48,7 @@ class ElementSpec extends ObjectBehavior
 
     function it_throws_exception_when_more_than_3_buttons_is_provided(Button $button)
     {
-        $this->beConstructedWith('title', 'subtitle',  null, null, [
+        $this->beConstructedWith('title', 'subtitle',  null, [
             $button,
             $button,
             $button,
@@ -68,16 +69,16 @@ class ElementSpec extends ObjectBehavior
             ->duringInstantiation();
     }
 
-    function it_should_be_serializable(Button $button)
+    function it_should_be_serializable($button, $defaultAction)
     {
         $this->shouldImplement(\JsonSerializable::class);
 
         $expected = [
             'title' => 'title',
-            'item_url' => 'item_url',
             'image_url' => 'image_url',
             'subtitle' => 'subtitle',
             'buttons' => [$button],
+            'default_action' => $defaultAction,
         ];
 
         $this->jsonSerialize()->shouldBeLike($expected);

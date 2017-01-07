@@ -4,13 +4,14 @@ namespace Tgallice\FBMessenger\Model\Attachment\Template\Generic;
 
 use Tgallice\FBMessenger\Model\Button;
 use Tgallice\FBMessenger\Model\Attachment\Template\AbstractElement;
+use Tgallice\FBMessenger\Model\DefaultAction;
 
 class Element extends AbstractElement
 {
     /**
-     * @var null|string
+     * @var null|DefaultAction
      */
-    private $itemUrl;
+    private $defaultAction;
 
     /**
      * @var null|Button[]
@@ -20,25 +21,16 @@ class Element extends AbstractElement
     /**
      * @param string $title
      */
-    public function __construct($title, $subtitle = null, $imageUrl = null, $itemUrl = null, $buttons = null)
+    public function __construct($title, $subtitle = null, $imageUrl = null, array $buttons = null, DefaultAction $defaultAction = null)
     {
         parent::__construct($title, $subtitle, $imageUrl);
-
-        $this->itemUrl = $itemUrl;
 
         if (count($buttons) > 3) {
             throw new \InvalidArgumentException('A generic element can not have more than 3 buttons.');
         }
 
         $this->buttons = $buttons;
-    }
-
-    /**
-     * @return null|string
-     */
-    public function getItemUrl()
-    {
-        return $this->itemUrl;
+        $this->defaultAction = $defaultAction;
     }
 
     /**
@@ -50,38 +42,11 @@ class Element extends AbstractElement
     }
 
     /**
-     * @deprecated use the constructor argument instead
-     * @param null|string $itemUrl
+     * @return null|DefaultAction
      */
-    public function setItemUrl($itemUrl)
+    public function getDefaultAction()
     {
-        $this->itemUrl = $itemUrl;
-    }
-
-    /**
-     * @deprecated use the constructor argument instead
-     * @param Button[] $buttons
-     */
-    public function setButtons(array $buttons)
-    {
-        if (count($buttons) > 3) {
-            throw new \InvalidArgumentException('A generic element can not have more than 3 buttons.');
-        }
-
-        $this->buttons = $buttons;
-    }
-
-    /**
-     * @deprecated use the constructor argument instead
-     * @param Button $button
-     */
-    public function addButton(Button $button)
-    {
-        if (count($this->buttons) >= 2 ) {
-            throw new \InvalidArgumentException('A generic element can not have more than 3 buttons.');
-        }
-
-        $this->buttons[] = $button;
+        return $this->defaultAction;
     }
 
     /**
@@ -91,10 +56,10 @@ class Element extends AbstractElement
     {
         return [
             'title' => $this->getTitle(),
-            'item_url' => $this->itemUrl,
             'image_url' => $this->getImageUrl(),
             'subtitle' => $this->getSubtitle(),
             'buttons' => $this->buttons,
+            'default_action' => $this->defaultAction,
         ];
     }
 }
