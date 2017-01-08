@@ -55,7 +55,8 @@ class WebhookRequestHandlerSpec extends ObjectBehavior
         $request->getBody()->willReturn($stream);
         $request->getHeader('X-Hub-Signature')->willReturn(['sha1='.$signature]);
 
-        $this->beConstructedWith('secret', 'verify_token', $request, $dispatcher);
+        $this->beConstructedWith('secret', 'verify_token', $dispatcher);
+        $this->handleRequest($request);
     }
 
     function it_is_initializable()
