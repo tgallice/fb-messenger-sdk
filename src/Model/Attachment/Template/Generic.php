@@ -35,7 +35,7 @@ class Generic extends Template
     }
 
     /**
-     * @return Element[]
+     * @return string
      */
     public function getType()
     {

@@ -3,28 +3,15 @@
 namespace Tgallice\FBMessenger\Model\Attachment\Template\Generic;
 
 use Tgallice\FBMessenger\Model\Button;
+use Tgallice\FBMessenger\Model\Attachment\Template\AbstractElement;
+use Tgallice\FBMessenger\Model\DefaultAction;
 
-class Element implements \JsonSerializable
+class Element extends AbstractElement
 {
     /**
-     * @var string
+     * @var null|DefaultAction
      */
-    private $title;
-
-    /**
-     * @var null|string
-     */
-    private $itemUrl;
-
-    /**
-     * @var null|string
-     */
-    private $imageUrl;
-
-    /**
-     * @var null|string
-     */
-    private $subtitle;
+    private $defaultAction;
 
     /**
      * @var null|Button[]
@@ -34,45 +21,16 @@ class Element implements \JsonSerializable
     /**
      * @param string $title
      */
-    public function __construct($title)
+    public function __construct($title, $subtitle = null, $imageUrl = null, array $buttons = null, DefaultAction $defaultAction = null)
     {
-        if (mb_strlen($title) > 80) {
-            throw new \InvalidArgumentException('In a generic element, the "title" field should not exceed 80 characters.');
+        parent::__construct($title, $subtitle, $imageUrl);
+
+        if (count($buttons) > 3) {
+            throw new \InvalidArgumentException('A generic element can not have more than 3 buttons.');
         }
 
-        $this->title = $title;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTitle()
-    {
-        return $this->title;
-    }
-
-    /**
-     * @return null|string
-     */
-    public function getItemUrl()
-    {
-        return $this->itemUrl;
-    }
-
-    /**
-     * @return null|string
-     */
-    public function getImageUrl()
-    {
-        return $this->imageUrl;
-    }
-
-    /**
-     * @return null|string
-     */
-    public function getSubtitle()
-    {
-        return $this->subtitle;
+        $this->buttons = $buttons;
+        $this->defaultAction = $defaultAction;
     }
 
     /**
@@ -84,55 +42,11 @@ class Element implements \JsonSerializable
     }
 
     /**
-     * @param null|string $itemUrl
+     * @return null|DefaultAction
      */
-    public function setItemUrl($itemUrl)
+    public function getDefaultAction()
     {
-        $this->itemUrl = $itemUrl;
-    }
-
-    /**
-     * @param null|string $imageUrl
-     */
-    public function setImageUrl($imageUrl)
-    {
-        $this->imageUrl = $imageUrl;
-    }
-
-    /**
-     * @param null|string $subtitle
-     */
-    public function setSubtitle($subtitle)
-    {
-        if (!empty($subtitle) && mb_strlen($subtitle) > 80) {
-            throw new \InvalidArgumentException('In a generic element, the "subtitle" field should not exceed 80 characters.');
-        }
-
-        $this->subtitle = $subtitle;
-    }
-
-    /**
-     * @param Button[] $buttons
-     */
-    public function setButtons(array $buttons)
-    {
-        if (count($buttons) > 3) {
-            throw new \InvalidArgumentException('A generic element can not have more than 3 buttons.');
-        }
-
-        $this->buttons = $buttons;
-    }
-
-    /**
-     * @param Button $button
-     */
-    public function addButton(Button $button)
-    {
-        if (count($this->buttons) >= 2 ) {
-            throw new \InvalidArgumentException('A generic element can not have more than 3 buttons.');
-        }
-
-        $this->buttons[] = $button;
+        return $this->defaultAction;
     }
 
     /**
@@ -141,11 +55,11 @@ class Element implements \JsonSerializable
     public function jsonSerialize()
     {
         return [
-            'title' => $this->title,
-            'item_url' => $this->itemUrl,
-            'image_url' => $this->imageUrl,
-            'subtitle' => $this->subtitle,
+            'title' => $this->getTitle(),
+            'image_url' => $this->getImageUrl(),
+            'subtitle' => $this->getSubtitle(),
             'buttons' => $this->buttons,
+            'default_action' => $this->defaultAction,
         ];
     }
 }
