@@ -10,6 +10,7 @@ class ElementList extends Template
 {
     const TOP_STYLE_COMPACT = 'compact';
     const TOP_STYLE_LARGE = 'large';
+
     /**
      * @var Element[]
      */
@@ -67,7 +68,7 @@ class ElementList extends Template
         return $this->topElementStyle;
     }
 
-    /***
+    /**
      * @return null|ButtonModel
      */
     public function getButton()
