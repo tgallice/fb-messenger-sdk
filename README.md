@@ -67,7 +67,7 @@ $messenger = Messenger::create('<PAGE_TOKEN>');
 
 $message = new Message('What do you like ?');
 $message->setQuickReplies([
-	new QuickReply('Apple', 'LIKE_APPLE_PAYLOAD'),
+    new QuickReply('Apple', 'LIKE_APPLE_PAYLOAD'),
     new QuickReply('Peach', 'LIKE_PEACH_PAYLOAD')
 ]);
 
@@ -75,7 +75,52 @@ $response = $messenger->sendMessage('<USER_ID>', $message);
 
 ```
 
-### Send a more complex message like a `Receipt` message
+### Send a more complex message with a [`Generic`](https://developers.facebook.com/docs/messenger-platform/send-api-reference/generic-template) template such as a horizontal scrollable carousel of items
+
+```php
+
+require_once __DIR__.'/vendor/autoload.php';
+
+use Tgallice\FBMessenger\Messenger;
+use Tgallice\FBMessenger\Model\DefaultAction;
+use Tgallice\FBMessenger\Model\Button\Share;
+use Tgallice\FBMessenger\Model\Button\WebUrl;
+use Tgallice\FBMessenger\Model\Button\Postback;
+use Tgallice\FBMessenger\Model\Attachment\Template\Generic;
+use Tgallice\FBMessenger\Model\Attachment\Template\Generic\Element;
+
+$messenger = Messenger::create('<PAGE_TOKEN>');
+
+$elements = [
+    new Element(
+        'My first Item',
+        'My first subtitle',
+        'http://www.site.com/image.jpg',
+        [ 
+            new WebUrl('Button 1 label', 'https://www.site.com'),
+            new Share()
+        ],
+        new DefaultAction('https://www.site.com/')
+    ),
+    new Element(
+        'My second Item',
+        'My second subtitle',
+        'http://www.site.com/image.jpg',
+        [ 
+            new Postback('Button 2 label', 'MY_PAYLOAD'),
+            new Share()
+        ],
+        new DefaultAction('https://www.domain.com/')
+    )
+];
+
+$template = new Generic($elements);
+
+$response = $messenger->sendMessage('<USER_ID>', $template);
+
+```
+
+### Send a more complex message with a [`Receipt`](https://developers.facebook.com/docs/messenger-platform/send-api-reference/receipt-template) template
 
 ```php
 
@@ -97,6 +142,47 @@ $summary = new Summary(<total_cost>);
 $receipt = new Receipt('My Receipt', '123456789', 'EUR', 'Visa', $elements, $summary);
 
 $response = $messenger->sendMessage('<USER_ID>', $receipt);
+
+```
+
+### Send a more complex message with a [`List`](https://developers.facebook.com/docs/messenger-platform/send-api-reference/list-template) template
+
+**Note:** See the Facebook Messenger Platform limitations for the [List Template](https://developers.facebook.com/docs/messenger-platform/send-api-reference/list-template#implementation).
+
+```php
+
+require_once __DIR__.'/vendor/autoload.php';
+
+use Tgallice\FBMessenger\Messenger;
+use Tgallice\FBMessenger\Model\DefaultAction;
+use Tgallice\FBMessenger\Model\Button\Share;
+use Tgallice\FBMessenger\Model\Attachment\Template\ElementList;
+use Tgallice\FBMessenger\Model\Attachment\Template\ElementList\Element;
+
+$messenger = Messenger::create('<PAGE_TOKEN>');
+
+$elements = [
+    new Element(
+        'My first Item',
+        'My first subtitle',
+        'http://www.site.com/image.jpg',
+        new Share(),
+        new DefaultAction('https://www.site.com/')
+    ),
+    new Element(
+        'My second Item',
+        'My second subtitle',
+        'http://www.site.com/image.jpg',
+        new Share(),
+        new DefaultAction('https://www.domain.com/')
+    )
+];
+
+// $elements = insert logic to meet List Template limitations (e.g. at least 2 elements and at most 4 elements)
+
+$list = new ElementList($elements);
+
+$response = $messenger->sendMessage('<USER_ID>', $list);
 
 ```
 
@@ -142,6 +228,35 @@ $response = $messenger->sendMessage('<USER_ID>', $image);
 // Remote file
 $image = new Image('http://www.site.com/image.jpg');
 $response = $messenger->sendMessage('<USER_ID>', $image);
+
+```
+
+### Get user profile
+
+```php
+
+require_once __DIR__.'/vendor/autoload.php';
+
+use Tgallice\FBMessenger\Client;
+use Tgallice\FBMessenger\Messenger;
+
+$messenger = Messenger::create('<PAGE_TOKEN>');
+
+// $event may be PostbackEvent or MessageEvent
+$profile = $messenger->getUserProfile($event->getSenderId());
+
+echo $profile->getFirstName();
+echo $profile->getLastName();
+echo $profile->getGender();
+echo $profile->getLocale();
+...
+
+// Result:
+//
+// John
+// Doe
+// male
+// en_US
 
 ```
 
@@ -263,17 +378,17 @@ class MessageEventListener implements EventSubscriberInterface
     {
         return [
             MessageEvent::NAME => 'onMessageEvent', // may also handle quick replies by checking with isQuickReply()
-			PostbackEvent::NAME => 'onPostbackEvent',
-			'DEVELOPER_DEFINED_PAYLOAD' => 'onQuickReply' // optional: quick reply specific payload
+            PostbackEvent::NAME => 'onPostbackEvent',
+            'DEVELOPER_DEFINED_PAYLOAD_1' => 'onQuickReply' // optional: quick reply specific payload
         ];
     }
 
     public function onMessageEvent(MessageEvent $event)
     {
-		if( $event->isQuickReply() ) {
-    		$this->onQuickReply($event);
-    		return;
-    	}
+        if( $event->isQuickReply() ) { // if a quick reply callback, pass it to our onQuickReply method
+            $this->onQuickReply($event);
+            return;
+        }
 		
         print(__METHOD__."\n");
     }
@@ -286,10 +401,10 @@ class MessageEventListener implements EventSubscriberInterface
     public function onQuickReply(MessageEvent $event)
     {
         switch( $event->getQuickReplyPayload() ) {
-    		case 'MY_QUICKREPLY_PAYLOAD_1':
-		    	print(__METHOD__."\n");
-		    	break;
-		}
+            case 'DEVELOPER_DEFINED_PAYLOAD_2':
+                print(__METHOD__."\n");
+                break;
+        }
     }
 }
 
