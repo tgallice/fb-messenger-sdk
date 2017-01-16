@@ -147,7 +147,7 @@ $response = $messenger->sendMessage('<USER_ID>', $receipt);
 
 ### Send a more complex message with a [`List`](https://developers.facebook.com/docs/messenger-platform/send-api-reference/list-template) template
 
-**Note:** See the Facebook Messenger Platform limitations for the [List Template](https://developers.facebook.com/docs/messenger-platform/send-api-reference/list-template#implementation).
+**Note:** See the Facebook Messenger Platform [List Template limitations](https://developers.facebook.com/docs/messenger-platform/send-api-reference/list-template#implementation).
 
 ```php
 
@@ -167,14 +167,14 @@ $elements = [
         'My first subtitle',
         'http://www.site.com/image.jpg',
         new Share(),
-        new DefaultAction('https://www.site.com/')
+        new DefaultAction('https://www.site.com/', DefaultAction::HEIGHT_RATIO_FULL)
     ),
     new Element(
         'My second Item',
         'My second subtitle',
         'http://www.site.com/image.jpg',
         new Share(),
-        new DefaultAction('https://www.domain.com/')
+        new DefaultAction('https://www.domain.com/', DefaultAction::HEIGHT_RATIO_COMPACT)
     )
 ];
 
