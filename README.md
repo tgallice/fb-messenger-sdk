@@ -75,7 +75,8 @@ $response = $messenger->sendMessage('<USER_ID>', $message);
 
 ```
 
-### Send a more complex message with a [`Generic`](https://developers.facebook.com/docs/messenger-platform/send-api-reference/generic-template) template such as a horizontal scrollable carousel of items
+### Send a more complex message with a [`Generic`](https://developers.facebook.com/docs/messenger-platform/send-api-reference/generic-template) template
+#### Horizontal scrollable carousel of items
 
 ```php
 
