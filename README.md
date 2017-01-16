@@ -1,7 +1,7 @@
 Facebook Messenger Bot PHP
 ==========================
 
-Implementation of the Facebook messenger bot api. 
+Implementation of the Facebook Messenger Platform API.
 
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/tgallice/fb-messenger-sdk/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/tgallice/fb-messenger-sdk/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/tgallice/fb-messenger-sdk/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/tgallice/fb-messenger-sdk/?branch=master)
@@ -29,11 +29,11 @@ require_once __DIR__.'/vendor/autoload.php';
 use Tgallice\FBMessenger\Client;
 use Tgallice\FBMessenger\Messenger;
 
-$client = new Client('page_token');
+$client = new Client('<PAGE_TOKEN>');
 $messenger = new Messenger($client);
 
 // Or quick factory
-$messenger = Messenger::create('page_token');
+$messenger = Messenger::create('<PAGE_TOKEN>');
 
 ```
 
@@ -46,7 +46,7 @@ require_once __DIR__.'/vendor/autoload.php';
 
 use Tgallice\FBMessenger\Messenger;
 
-$messenger = Messenger::create('page_token');
+$messenger = Messenger::create('<PAGE_TOKEN>');
 
 // Simple Text message
 $response = $messenger->sendMessage('<USER_ID>', 'My Message');
@@ -63,11 +63,11 @@ use Tgallice\FBMessenger\Messenger;
 use Tgallice\FBMessenger\Model\Message;
 use Tgallice\FBMessenger\Model\QuickReply;
 
-$messenger = Messenger::create('page_token');
+$messenger = Messenger::create('<PAGE_TOKEN>');
 
 $message = new Message('What do you like ?');
 $message->setQuickReplies([
-    new QuickReply('Apple', 'LIKE_APPLE_PAYLOAD'),
+	new QuickReply('Apple', 'LIKE_APPLE_PAYLOAD'),
     new QuickReply('Peach', 'LIKE_PEACH_PAYLOAD')
 ]);
 
@@ -86,7 +86,7 @@ use Tgallice\FBMessenger\Model\Attachment\Template\Receipt;
 use Tgallice\FBMessenger\Model\Attachment\Template\Receipt\Element;
 use Tgallice\FBMessenger\Model\Attachment\Template\Receipt\Summary;
 
-$messenger = Messenger::create('page_token');
+$messenger = Messenger::create('<PAGE_TOKEN>');
 
 $elements = [
     new Element('My first Item', <price>),
@@ -110,7 +110,7 @@ use Tgallice\FBMessenger\Model\Attachment\Template\Button;
 use Tgallice\FBMessenger\Model\Button\WebUrl;
 use Tgallice\FBMessenger\Model\Button\Postback;
 
-$messenger = Messenger::create('page_token');
+$messenger = Messenger::create('<PAGE_TOKEN>');
 
 $elements = [
     new WebUrl('Button1', 'http://google.com'),
@@ -133,7 +133,7 @@ require_once __DIR__.'/vendor/autoload.php';
 use Tgallice\FBMessenger\Messenger;
 use Tgallice\FBMessenger\Model\Attachment\Image;
 
-$messenger = Messenger::create('page_token');
+$messenger = Messenger::create('<PAGE_TOKEN>');
 
 // Local file
 $image = new Image('./image.jpg');
@@ -262,23 +262,38 @@ class MessageEventListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            MessageEvent::NAME => 'onMessageEvent',
-            'DEVELOPER_DEFINED_PAYLOAD' => 'onQuickReply',
+            MessageEvent::NAME => 'onMessageEvent', // may also handle quick replies by checking with isQuickReply()
+			PostbackEvent::NAME => 'onPostbackEvent',
+			'DEVELOPER_DEFINED_PAYLOAD' => 'onQuickReply' // optional: quick reply specific payload
         ];
     }
 
     public function onMessageEvent(MessageEvent $event)
     {
-        prin(__METHOD__."\n");
+		if( $event->isQuickReply() ) {
+    		$this->onQuickReply($event);
+    		return;
+    	}
+		
+        print(__METHOD__."\n");
+    }
+
+    public function onPostbackEvent(PostbackEvent $event)
+    {
+        print(__METHOD__."\n");
     }
 
     public function onQuickReply(MessageEvent $event)
     {
-        prin(__METHOD__."\n");
+        switch( $event->getQuickReplyPayload() ) {
+    		case 'MY_QUICKREPLY_PAYLOAD_1':
+		    	print(__METHOD__."\n");
+		    	break;
+		}
     }
 }
 
-$webhookHandler = new WebhookRequestHandler('app_secret', 'verify_token');
+$webhookHandler = new WebhookRequestHandler('<APP_SECRET>', '<VERIFY_TOKEN>');
 
 // Register the listener
 $webhook->addEventSubscriber(new MessageEventListener());
@@ -292,6 +307,7 @@ $webhook->dispatchCallbackEvents();
 // Result:
 //
 // MessageEventListener::onMessageEvent
+// MessageEventListener::onPostbackEvent
 // MessageEventListener::onQuickReply
 
 
@@ -308,7 +324,7 @@ require_once __DIR__.'/vendor/autoload.php';
 
 use Tgallice\FBMessenger\Messenger;
 
-$messenger = Messenger::create('page_token');
+$messenger = Messenger::create('<PAGE_TOKEN>');
 $messenger->setGreetingText('Tell me what you want.');
 
 ```
@@ -321,7 +337,7 @@ require_once __DIR__.'/vendor/autoload.php';
 
 use Tgallice\FBMessenger\Messenger;
 
-$messenger = Messenger::create('page_token');
+$messenger = Messenger::create('<PAGE_TOKEN>');
 $messenger->setStartedButton('MY_PLAYLOAD_TO_TRIGGER');
 
 ```
@@ -336,7 +352,7 @@ use Tgallice\FBMessenger\Messenger;
 use Tgallice\FBMessenger\Model\ThreadSetting\PostBack;
 use Tgallice\FBMessenger\Model\ThreadSetting\WebUrl;
 
-$messenger = Messenger::create('page_token');
+$messenger = Messenger::create('<PAGE_TOKEN>');
 
 $buttons = [
     new PostBack('Button Title 1', 'MY_PAYLOAD'),      
@@ -357,7 +373,7 @@ require_once __DIR__.'/vendor/autoload.php';
 
 use Tgallice\FBMessenger\Messenger;
 
-$messenger = Messenger::create('page_token');
+$messenger = Messenger::create('<PAGE_TOKEN>');
 $messenger->subscribe();
 
 ```
