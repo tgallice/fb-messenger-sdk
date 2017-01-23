@@ -125,7 +125,7 @@ class Message
     public static function create(array $payload)
     {
         $text = isset($payload['text']) ? $payload['text'] : null;
-        $attachments = isset($payload['$attachments']) ? $payload['$attachments'] : [];
+        $attachments = isset($payload['attachments']) ? $payload['attachments'] : [];
         $quickReply = isset($payload['quick_reply']) ? $payload['quick_reply']['payload'] : null;
 
         return new static($payload['mid'], $payload['seq'], $text, $attachments, $quickReply);
