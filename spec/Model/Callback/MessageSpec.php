@@ -43,7 +43,7 @@ class MessageSpec extends ObjectBehavior
         $this->getAttachments()->shouldReturn(['attachment']);
     }
 
-    function its_attchaments_can_be_empty()
+    function its_attachments_can_be_empty()
     {
         $this->beConstructedWith('id', 1, null, []);
         $this->hasAttachments()->shouldReturn(false);
