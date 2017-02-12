@@ -7,6 +7,23 @@ use Tgallice\FBMessenger\Model\Message;
 
 class RequestOptionsFactory
 {
+
+	/**
+     * @param $recipientOrPhone
+     * @param $typingIndicator
+     * @return mixed
+     */
+    public static function createForTyping($recipientOrPhone, $typingIndicator) {
+        $options = [];
+        $data = [
+            'recipient'     => self::createRecipientField($recipientOrPhone),
+            'sender_action' => $typingIndicator,
+        ];
+        $options[RequestOptions::JSON] = $data;
+
+        return $options;
+    }
+
     /**
      * @param string $recipientOrPhone
      * @param Message $message
