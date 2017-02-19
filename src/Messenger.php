@@ -50,6 +50,15 @@ class Messenger
     }
 
     /**
+     * @param $recipient
+     * @param NotificationType $notificationType
+     */
+    public function setTypingStatus($recipient, $typingIndicator) {
+        $options = RequestOptionsFactory::createForTyping($recipient, $typingIndicator);
+        $this->client->send('POST', '/me/messages', null, [], [], $options);
+    }
+
+    /**
      * @param string $userId
      * @param array $fields
      *
