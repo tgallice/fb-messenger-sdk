@@ -8,10 +8,11 @@ use Tgallice\FBMessenger\Model\Message;
 class RequestOptionsFactory
 {
 
-	/**
-     * @param $recipientOrPhone
-     * @param $typingIndicator
-     * @return mixed
+    /**
+     * @param string $recipientOrPhone
+     * @param string $typingIndicator
+     *
+     * @return array
      */
     public static function createForTyping($recipientOrPhone, $typingIndicator) {
         $options = [];

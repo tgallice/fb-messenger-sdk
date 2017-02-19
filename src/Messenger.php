@@ -50,8 +50,8 @@ class Messenger
     }
 
     /**
-     * @param $recipient
-     * @param NotificationType $notificationType
+     * @param string $recipient
+     * @param string $typingIndicator
      */
     public function setTypingStatus($recipient, $typingIndicator) {
         $options = RequestOptionsFactory::createForTyping($recipient, $typingIndicator);

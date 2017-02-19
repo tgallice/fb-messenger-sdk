@@ -17,6 +17,7 @@ use Tgallice\FBMessenger\Model\MessageResponse;
 use Tgallice\FBMessenger\Model\ThreadSetting;
 use Tgallice\FBMessenger\Model\UserProfile;
 use Tgallice\FBMessenger\NotificationType;
+use Tgallice\FBMessenger\TypingIndicator;
 
 class MessengerSpec extends ObjectBehavior
 {
@@ -279,5 +280,21 @@ class MessengerSpec extends ObjectBehavior
         $client->send('DELETE', '/me/thread_settings', $body)->shouldBeCalled();
 
         $this->deletePersistentMenu();
+    }
+
+    function it_should_set_typing_status($client)
+    {
+        $options = [
+            'json' => [
+                'recipient' => [
+                    'id' => 'USER_ID',
+                ],
+                'sender_action' => 'typing_on',
+            ],
+        ];
+
+        $client->send('POST', '/me/messages', null, [], [], $options)->shouldBeCalled();
+
+        $this->setTypingStatus('USER_ID', TypingIndicator::TYPING_ON);
     }
 }
