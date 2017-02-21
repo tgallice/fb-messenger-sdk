@@ -118,6 +118,22 @@ class Message
     }
 
     /**
+     * @return string|null
+     */
+    public function getLatitude()
+    {
+    	return $this->hasLocation() ? $this->attachments[0]['payload']['coordinates']['lat'] : null;
+    }
+    
+    /**
+     * @return string|null
+     */
+    public function getLongitude()
+    {
+    	return $this->hasLocation() ? $this->attachments[0]['payload']['coordinates']['long'] : null;
+    }
+    
+    /**
      * @param array $payload
      *
      * @return static
