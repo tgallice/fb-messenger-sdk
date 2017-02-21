@@ -11,7 +11,9 @@ use Tgallice\FBMessenger\Model\MessageResponse;
 use Tgallice\FBMessenger\Model\ThreadSetting;
 use Tgallice\FBMessenger\Model\ThreadSetting\GreetingText;
 use Tgallice\FBMessenger\Model\ThreadSetting\StartedButton;
+use Tgallice\FBMessenger\Model\ThreadSetting\DomainWhitelisting;
 use Tgallice\FBMessenger\Model\UserProfile;
+use Tgallice\FBMessenger\Model\WhitelistedDomains;
 
 class Messenger
 {
@@ -91,6 +93,34 @@ class Messenger
     }
 
     /**
+     * @param array $domains
+     * @param string $action
+     */
+    public function setDomainWhitelisting($domains, $action = 'add')
+    {
+    	$domainWhitelisting = new DomainWhitelisting($domains, $action);
+    	$setting = $this->buildSetting(ThreadSetting::TYPE_DOMAIN_WHITELISTING, null, $domainWhitelisting, true);
+
+    	$this->postThreadSettings($setting);
+    }
+    
+    /**
+     * @return WhitelistedDomains
+     */
+    public function getDomainWhitelisting()
+    {
+    	$query = [
+    		'fields' => DomainWhitelisting::WHITELISTED_DOMAINS
+    	];
+    	
+    	$response = $this->client->get('/me/thread_settings', $query);
+    	$data = $this->decodeResponse($response);
+    	
+    	return WhitelistedDomains::create($data)
+    		->getDomains();
+    }
+    
+    /**
      * @param $text
      */
     public function setGreetingText($text)
@@ -153,14 +183,7 @@ class Messenger
 
         $this->deleteThreadSettings($setting);
     }
-
-    public function deleteGreetingText()
-    {
-        $setting = $this->buildSetting(ThreadSetting::TYPE_GREETING);
-
-        $this->deleteThreadSettings($setting);
-    }
-
+    
     /**
      * Messenger Factory
      *
@@ -191,15 +214,25 @@ class Messenger
     {
         $this->client->send('DELETE', '/me/thread_settings', $setting);
     }
+    
+    /**
+     * @param array $setting
+     */
+    private function getThreadSettings(array $setting)
+    {
+    	print_r($this->client->send('GET', '/me/thread_settings', null, $setting)->getContents());
+    	
+    }
 
     /**
      * @param string $type
      * @param null|string $threadState
      * @param mixed $value
+     * @param bool
      *
      * @return array
      */
-    private function buildSetting($type, $threadState = null, $value = null)
+    private function buildSetting($type, $threadState = null, $value = null, $callJsonSerialize = false)
     {
         $setting = [
             'setting_type' => $type,
@@ -208,7 +241,12 @@ class Messenger
         if (!empty($threadState)) {
             $setting['thread_state'] = $threadState;
         }
-
+        
+        //For the custom payload format...
+        if($callJsonSerialize) {
+        	return array_merge($setting, $value->jsonSerialize());
+        }
+        
         if (!empty($value)) {
             $setting[$type] = $value;
         }
@@ -236,5 +274,10 @@ class Messenger
         }
 
         throw new \InvalidArgumentException('$message should be a string, Message, Attachment or Template');
+    }
+
+    public function deleteGreetingText()
+    {
+        // TODO: write logic here
     }
 }

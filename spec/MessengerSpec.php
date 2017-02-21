@@ -196,6 +196,21 @@ class MessengerSpec extends ObjectBehavior
         $this->setGreetingText('my text');
     }
 
+    function it_should_define_domain_whitelisting($client)
+    {
+    	$expectedBody = [
+    		'setting_type' => 'domain_whitelisting',
+    		'whitelisted_domains' => ['https://www.google.com'],
+    		'domain_action_type' => 'add'
+    	];
+    	
+		$client->post('/me/thread_settings', Argument::that(function ($body) use ($expectedBody) {
+            return json_encode($body) === json_encode($expectedBody);
+        }))->shouldBeCalled();
+        
+        $this->setDomainWhitelisting(['https://www.google.com']);
+    }
+    
     function it_should_delete_greeting_text($client)
     {
         $body = [
