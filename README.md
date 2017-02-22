@@ -261,6 +261,29 @@ echo $profile->getLocale();
 
 ```
 
+### Set typing indicators or send read receipts
+
+```php
+
+require_once __DIR__.'/vendor/autoload.php';
+
+use Tgallice\FBMessenger\Client;
+use Tgallice\FBMessenger\Messenger;
+
+$messenger = Messenger::create('<PAGE_TOKEN>');
+
+// Send read receipt indicating the user message has been received and "seen"
+$messenger->setTypingStatus('<USER_ID>', \Tgallice\FBMessenger\TypingIndicator::MARK_SEEN);
+
+// Turn on typing indicator to let users know you are processing their request
+$messenger->setTypingStatus('<USER_ID>', \Tgallice\FBMessenger\TypingIndicator::TYPING_ON);
+
+// Turn off typing indicator, e.g. after the user request has been finished processing
+// and your response has been sent with $messenger->sendMessage()
+$messenger->setTypingStatus('<USER_ID>', \Tgallice\FBMessenger\TypingIndicator::TYPING_OFF);
+
+```
+
 
 ## Webhook setup
 
