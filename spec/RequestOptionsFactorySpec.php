@@ -67,4 +67,18 @@ class RequestOptionsFactorySpec extends ObjectBehavior
         $this::createRecipientField('+1(212)555-2368')
             ->shouldReturn(['phone_number' => '+1(212)555-2368']);
     }
+
+    function it_should_create_options_for_typing()
+    {
+        $this->createForTyping('USER_ID', 'status')->shouldReturn(
+            [
+                'json' => [
+                    'recipient' => [
+                        'id' => 'USER_ID',
+                    ],
+                    'sender_action' => 'status',
+                ],
+            ]
+        );
+    }
 }

@@ -40,12 +40,13 @@ class CallbackEventFactorySpec extends ObjectBehavior
               "message":{
                 "mid":"mid.1457764197618:41d102a3e1ae206a38",
                 "seq":73,
+                "attachments": [{"type": "image", "url": "http://domain.com/example.jpg"}],
                 "text":"hello, world!",
                 "quick_reply": {
                   "payload": "DEVELOPER_DEFINED_PAYLOAD"
                 }
               }
-            }    
+            }
         ';
 
         $arr = json_decode($raw, true);
@@ -54,6 +55,10 @@ class CallbackEventFactorySpec extends ObjectBehavior
 
         $event = $this::createMessageEvent($arr);
         $event->shouldBeLike($expectedEvent);
+        $event->getMessage()->getAttachments()->shouldBeLike([[
+			"type" => "image",
+			"url" => "http://domain.com/example.jpg"
+		]]);
 
         $event2 = $this::create($arr);
         $event2->shouldBeLike($expectedEvent);
@@ -73,7 +78,7 @@ class CallbackEventFactorySpec extends ObjectBehavior
               "postback":{
                 "payload":"USER_DEFINED_PAYLOAD"
               }
-            }    
+            }
         ';
 
         $arr = json_decode($raw, true);
@@ -101,7 +106,7 @@ class CallbackEventFactorySpec extends ObjectBehavior
               "optin":{
                 "ref":"PASS_THROUGH_PARAM"
               }
-            } 
+            }
         ';
 
         $arr = json_decode($raw, true);
@@ -130,7 +135,7 @@ class CallbackEventFactorySpec extends ObjectBehavior
                 "status":"linked",
                 "authorization_code":"PASS_THROUGH_AUTHORIZATION_CODE"
               }
-            }  
+            }
         ';
 
         $arr = json_decode($raw, true);
@@ -161,7 +166,7 @@ class CallbackEventFactorySpec extends ObjectBehavior
                   "watermark":1458668856253,
                   "seq":37
                }
-            }    
+            }
         ';
 
         $arr = json_decode($raw, true);
@@ -190,7 +195,7 @@ class CallbackEventFactorySpec extends ObjectBehavior
                   "watermark":1458668856253,
                   "seq":38
                }
-            }  
+            }
         ';
 
         $arr = json_decode($raw, true);
@@ -222,7 +227,7 @@ class CallbackEventFactorySpec extends ObjectBehavior
                 "mid":"mid.1457764197618:41d102a3e1ae206a38",
                 "seq":73
               }
-            }  
+            }
         ';
 
         $arr = json_decode($raw, true);
@@ -249,7 +254,7 @@ class CallbackEventFactorySpec extends ObjectBehavior
               "unknown":{
                 "item":"value"
               }
-            } 
+            }
         ';
 
         $arr = json_decode($raw, true);

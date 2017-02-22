@@ -52,16 +52,23 @@ class WebhookRequestHandler
     private $dispatcher;
 
     /**
-     * @param string $secret
-     * @param string $verifyToken
-     * @param ServerRequestInterface|null $request
+     * @param $secret
+     * @param $verifyToken
+     * @param EventDispatcherInterface|null $dispatcher
      */
-    public function __construct($secret, $verifyToken, ServerRequestInterface $request = null, EventDispatcherInterface $dispatcher = null)
+    public function __construct($secret, $verifyToken, EventDispatcherInterface $dispatcher = null)
     {
         $this->secret = $secret;
         $this->verifyToken = $verifyToken;
-        $this->request = $request ?: ServerRequest::fromGlobals();
         $this->dispatcher = $dispatcher ?: new EventDispatcher();
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     */
+    public function handleRequest(ServerRequestInterface $request)
+    {
+        $this->request = $request;
     }
 
     /**
@@ -72,11 +79,11 @@ class WebhookRequestHandler
      */
     public function isValidVerifyTokenRequest()
     {
-        if ($this->request->getMethod() !== 'GET') {
+        if ($this->getRequest()->getMethod() !== 'GET') {
             return false;
         }
 
-        $params = $this->request->getQueryParams();
+        $params = $this->getRequest()->getQueryParams();
 
         if (!isset($params['hub_verify_token'])) {
             return false;
@@ -90,7 +97,7 @@ class WebhookRequestHandler
      */
     public function getChallenge()
     {
-        $params = $this->request->getQueryParams();
+        $params = $this->getRequest()->getQueryParams();
 
         return isset($params['hub_challenge']) ? $params['hub_challenge'] : null;
     }
@@ -153,7 +160,11 @@ class WebhookRequestHandler
      */
     public function getRequest()
     {
-        return $this->request;
+        if ($this->request) {
+            return $this->request;
+        }
+
+        return $this->request = ServerRequest::fromGlobals();
     }
 
     /**
@@ -228,7 +239,7 @@ class WebhookRequestHandler
             return $this->body;
         }
 
-        $this->body = (string) $this->request->getBody();
+        $this->body = (string) $this->getRequest()->getBody();
 
         return $this->body;
     }
@@ -238,7 +249,7 @@ class WebhookRequestHandler
      */
     private function isValidHubSignature()
     {
-        $headers = $this->request->getHeader('X-Hub-Signature');
+        $headers = $this->getRequest()->getHeader('X-Hub-Signature');
 
         if (empty($headers)) {
             return false;

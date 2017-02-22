@@ -134,7 +134,7 @@ class WebUrl extends Button
             $json['messenger_extensions'] = $this->messengerExtensions;
         }
 
-        if (!empty($this->fallbackUrl)) {
+        if ($this->messengerExtensions && !empty($this->fallbackUrl)) {
             $json['fallback_url'] = $this->fallbackUrl;
         }
 

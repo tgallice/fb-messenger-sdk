@@ -2,17 +2,14 @@
 
 namespace Tgallice\FBMessenger\Model\Attachment\Template\Receipt;
 
-class Element implements \JsonSerializable
+use Tgallice\FBMessenger\Model\Attachment\Template\AbstractElement;
+
+class Element extends AbstractElement
 {
     /**
      * @var null|string
      */
     private $currency;
-
-    /**
-     * @var null|string
-     */
-    private $imageUrl;
 
     /**
      * @var int
@@ -23,16 +20,6 @@ class Element implements \JsonSerializable
      * @var int|null
      */
     private $quantity;
-
-    /**
-     * @var null|string
-     */
-    private $subtitle;
-
-    /**
-     * @var string
-     */
-    private $title;
 
     /**
      * @param string $title
@@ -51,36 +38,10 @@ class Element implements \JsonSerializable
         $imageUrl = null
     ) {
 
+        parent::__construct($title, $subtitle, $imageUrl);
         $this->currency = $currency;
-        $this->imageUrl = $imageUrl;
         $this->price = $price;
         $this->quantity = $quantity;
-        $this->subtitle = $subtitle;
-        $this->title = $title;
-    }
-
-    /**
-     * @return null|string
-     */
-    public function getImageUrl()
-    {
-        return $this->imageUrl;
-    }
-
-    /**
-     * @return null|string
-     */
-    public function getSubtitle()
-    {
-        return $this->subtitle;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTitle()
-    {
-        return $this->title;
     }
 
     /**
@@ -113,12 +74,12 @@ class Element implements \JsonSerializable
     public function jsonSerialize()
     {
         return [
-            'title' => $this->title,
-            'subtitle' => $this->subtitle,
+            'title' => $this->getTitle(),
+            'subtitle' => $this->getSubtitle(),
             'quantity' => $this->quantity,
             'price' => $this->price,
             'currency' => $this->currency,
-            'image_url' => $this->imageUrl,
+            'image_url' => $this->getImageUrl(),
         ];
     }
 }
