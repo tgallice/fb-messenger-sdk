@@ -13,7 +13,7 @@ class LocationSpec extends ObjectBehavior
         $this->shouldHaveType('Tgallice\FBMessenger\Model\QuickReply\Location');
     }
 
-    function it_is_a_button()
+    function it_is_a_quickreply()
     {
         $this->shouldImplement(QuickReply::class);
     }

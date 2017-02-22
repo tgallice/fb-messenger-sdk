@@ -52,7 +52,7 @@ class TextSpec extends ObjectBehavior
 
     function it_should_be_serializable_with_image_url()
     {
-    	$this->beConstructedWith('title', 'payload', 'image_url');
+        $this->beConstructedWith('title', 'payload', 'image_url');
         $this->shouldImplement(\JsonSerializable::class);
         $expected = [
             'type' => 'text',
