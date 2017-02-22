@@ -11,7 +11,9 @@ use Tgallice\FBMessenger\Model\MessageResponse;
 use Tgallice\FBMessenger\Model\ThreadSetting;
 use Tgallice\FBMessenger\Model\ThreadSetting\GreetingText;
 use Tgallice\FBMessenger\Model\ThreadSetting\StartedButton;
+use Tgallice\FBMessenger\Model\ThreadSetting\DomainWhitelisting;
 use Tgallice\FBMessenger\Model\UserProfile;
+use Tgallice\FBMessenger\Model\WhitelistedDomains;
 
 class Messenger
 {
@@ -171,6 +173,33 @@ class Messenger
     }
 
     /**
+     * @param array $domains
+     * @param string $action
+     */
+    public function setDomainWhitelisting($domains, $action = DomainWhitelisting::TYPE_ADD)
+    {
+        $domainWhitelisting = new DomainWhitelisting($domains, $action);
+        $setting = $this->buildSetting(ThreadSetting::TYPE_DOMAIN_WHITELISTING, null, $domainWhitelisting, true);
+    
+        $this->postThreadSettings($setting);
+    }
+    
+    /**
+     * @return array
+     */
+    public function getDomainWhitelisting()
+    {
+        $query = [
+            'fields' => DomainWhitelisting::WHITELISTED_DOMAINS
+        ];
+    
+        $response = $this->client->get('/me/thread_settings', $query);
+        $data = $this->decodeResponse($response);
+    
+        return WhitelistedDomains::create($data);
+    }
+    
+    /**
      * Messenger Factory
      *
      * @param string $token
@@ -205,10 +234,11 @@ class Messenger
      * @param string $type
      * @param null|string $threadState
      * @param mixed $value
+     * @param bool $mergeValueWithSetting
      *
      * @return array
      */
-    private function buildSetting($type, $threadState = null, $value = null)
+    private function buildSetting($type, $threadState = null, $value = null, $mergeValueWithSetting = false)
     {
         $setting = [
             'setting_type' => $type,
@@ -217,8 +247,10 @@ class Messenger
         if (!empty($threadState)) {
             $setting['thread_state'] = $threadState;
         }
-
-        if (!empty($value)) {
+        
+        if($mergeValueWithSetting === true) {
+        	$setting = array_merge($setting, $value->jsonSerialize());
+        } else if(!empty($value)) {
             $setting[$type] = $value;
         }
 
