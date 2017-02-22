@@ -98,26 +98,25 @@ class Messenger
      */
     public function setDomainWhitelisting($domains, $action = 'add')
     {
-    	$domainWhitelisting = new DomainWhitelisting($domains, $action);
-    	$setting = $this->buildSetting(ThreadSetting::TYPE_DOMAIN_WHITELISTING, null, $domainWhitelisting, true);
+        $domainWhitelisting = new DomainWhitelisting($domains, $action);
+        $setting = $this->buildSetting(ThreadSetting::TYPE_DOMAIN_WHITELISTING, null, $domainWhitelisting, true);
 
-    	$this->postThreadSettings($setting);
+        $this->postThreadSettings($setting);
     }
     
     /**
-     * @return WhitelistedDomains
+     * @return array
      */
     public function getDomainWhitelisting()
     {
-    	$query = [
-    		'fields' => DomainWhitelisting::WHITELISTED_DOMAINS
-    	];
-    	
-    	$response = $this->client->get('/me/thread_settings', $query);
-    	$data = $this->decodeResponse($response);
-    	
-    	return WhitelistedDomains::create($data)
-    		->getDomains();
+        $query = [
+            'fields' => DomainWhitelisting::WHITELISTED_DOMAINS
+        ];
+        
+        $response = $this->client->get('/me/thread_settings', $query);
+        $data = $this->decodeResponse($response);
+        
+        return WhitelistedDomains::create($data);
     }
     
     /**
@@ -198,7 +197,6 @@ class Messenger
         return new self($client);
     }
 
-
     /**
      * @param array $setting
      */
@@ -213,15 +211,6 @@ class Messenger
     private function deleteThreadSettings(array $setting)
     {
         $this->client->send('DELETE', '/me/thread_settings', $setting);
-    }
-    
-    /**
-     * @param array $setting
-     */
-    private function getThreadSettings(array $setting)
-    {
-    	print_r($this->client->send('GET', '/me/thread_settings', null, $setting)->getContents());
-    	
     }
 
     /**
@@ -244,7 +233,7 @@ class Messenger
         
         //For the custom payload format...
         if($callJsonSerialize) {
-        	return array_merge($setting, $value->jsonSerialize());
+            return array_merge($setting, $value->jsonSerialize());
         }
         
         if (!empty($value)) {
@@ -278,6 +267,10 @@ class Messenger
 
     public function deleteGreetingText()
     {
-        // TODO: write logic here
+        $setting = [
+            'setting_type' => 'greeting'
+        ];
+        
+        $this->deleteThreadSettings($setting);
     }
 }

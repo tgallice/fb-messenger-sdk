@@ -20,7 +20,7 @@ class DomainWhitelisting implements ThreadSetting, \JsonSerializable
 	/**
 	 * @var array
 	 */
-	private $domains;
+	private $domains = [];
 	
 	/**
 	 * 
@@ -36,6 +36,24 @@ class DomainWhitelisting implements ThreadSetting, \JsonSerializable
 		
 		$this->action = $action;
 		$this->domains = $domains;
+	}
+	
+	/**
+	 * 
+	 * @return array
+	 */
+	public function getDomains()
+	{
+		return $this->domains;
+	}
+	
+	/**
+	 * 
+	 * @return string
+	 */
+	public function getAction()
+	{
+		return $this->action;
 	}
 	
 	/**
@@ -60,7 +78,7 @@ class DomainWhitelisting implements ThreadSetting, \JsonSerializable
 	public static function validateDomains($domains)
 	{
 		if(!is_array($domains)) {
-			throw new \InvalidArgumentException('$domains must be a array.');
+			throw new \InvalidArgumentException('Domains must be a array.');
 		}
 		
 		//https://developers.facebook.com/docs/messenger-platform/thread-settings/domain-whitelisting
