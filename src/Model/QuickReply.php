@@ -10,22 +10,22 @@ abstract class QuickReply implements \JsonSerializable
     /**
      * @var string
      */
-    private $type;
+    private $contentType;
 
     /**
-     * @param string $type
+     * @param string $contentType TYPE_*
      */
-    public function __construct($type)
+    public function __construct($contentType)
     {
-        $this->type = $type;
+        $this->contentType = $contentType;
     }
 
     /**
      * @return string
      */
-    public function getType()
+    public function getContentType()
     {
-        return $this->type;
+        return $this->contentType;
     }
     
     /**
@@ -33,11 +33,9 @@ abstract class QuickReply implements \JsonSerializable
      */
     public function jsonSerialize()
     {
-        $json = [
-            'type' => $this->type,
+        return [
+            'content_type' => $this->contentType,
         ];
-
-        return $json;
     }
     
     /**

@@ -18,16 +18,16 @@ class LocationSpec extends ObjectBehavior
         $this->shouldImplement(QuickReply::class);
     }
 
-    function it_has_a_type()
+    function it_has_a_content_type()
     {
-        $this->getType()->shouldReturn(QuickReply::TYPE_LOCATION);
+        $this->getContentType()->shouldReturn(QuickReply::TYPE_LOCATION);
     }
     
     function it_should_be_serializable()
     {
         $this->shouldImplement(\JsonSerializable::class);
         $expected = [
-            'type' => 'location'
+            'content_type' => 'location'
         ];
 
         $this->jsonSerialize()->shouldBeLike($expected);

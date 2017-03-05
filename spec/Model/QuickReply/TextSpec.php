@@ -23,9 +23,9 @@ class TextSpec extends ObjectBehavior
         $this->shouldImplement(QuickReply::class);
     }
 
-    function it_has_a_type()
+    function it_has_a_content_type()
     {
-        $this->getType()->shouldReturn(QuickReply::TYPE_TEXT);
+        $this->getContentType()->shouldReturn(QuickReply::TYPE_TEXT);
     }
 
     function it_has_a_title()
@@ -42,7 +42,7 @@ class TextSpec extends ObjectBehavior
     {
         $this->shouldImplement(\JsonSerializable::class);
         $expected = [
-            'type' => 'text',
+            'content_type' => 'text',
             'title' => 'title',
             'payload' => 'payload'
         ];
@@ -55,7 +55,7 @@ class TextSpec extends ObjectBehavior
         $this->beConstructedWith('title', 'payload', 'image_url');
         $this->shouldImplement(\JsonSerializable::class);
         $expected = [
-            'type' => 'text',
+            'content_type' => 'text',
             'title' => 'title',
             'payload' => 'payload',
             'image_url' => 'image_url'
