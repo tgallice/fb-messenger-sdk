@@ -61,14 +61,14 @@ require_once __DIR__.'/vendor/autoload.php';
 
 use Tgallice\FBMessenger\Messenger;
 use Tgallice\FBMessenger\Model\Message;
-use Tgallice\FBMessenger\Model\QuickReply;
+use Tgallice\FBMessenger\Model\QuickReply\Text;
 
 $messenger = Messenger::create('<PAGE_TOKEN>');
 
 $message = new Message('What do you like ?');
 $message->setQuickReplies([
-    new QuickReply('Apple', 'LIKE_APPLE_PAYLOAD'),
-    new QuickReply('Peach', 'LIKE_PEACH_PAYLOAD')
+    new Text('Apple', 'LIKE_APPLE_PAYLOAD'),
+    new Text('Peach', 'LIKE_PEACH_PAYLOAD')
 ]);
 
 $response = $messenger->sendMessage('<USER_ID>', $message);
