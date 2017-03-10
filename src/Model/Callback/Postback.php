@@ -9,12 +9,19 @@ class Postback
      */
     private $payload;
 
+	/**
+	 * @var Referral
+	 */
+	private $referral;
+
     /**
      * @param string $payload
+	 * @param Referral $referral
      */
-    public function __construct($payload)
+    public function __construct($payload, Referral $referral = null)
     {
         $this->payload = $payload;
+		$this->referral = $referral;
     }
 
     /**
@@ -25,6 +32,22 @@ class Postback
         return $this->payload;
     }
 
+	/**
+     * @return Referral
+     */
+    public function getReferral()
+    {
+        return $this->referral;
+    }
+
+	/**
+	 * @return boolean
+	 */
+	public function hasReferral()
+	{
+		return $this->referral !== null;
+	}
+
     /**
      * @param array $payload
      *
@@ -32,6 +55,8 @@ class Postback
      */
     public static function create(array $payload)
     {
-        return new static($payload['payload']);
+		$referral = isset($payload['referral']) ? Referral::create($payload['referral']) : null;
+
+        return new static($payload['payload'], $referral);
     }
 }

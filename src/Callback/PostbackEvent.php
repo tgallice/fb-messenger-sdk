@@ -3,6 +3,7 @@
 namespace Tgallice\FBMessenger\Callback;
 
 use Tgallice\FBMessenger\Model\Callback\Postback;
+use Tgallice\FBMessenger\Model\Callback\Referral;
 
 class PostbackEvent extends CallbackEvent
 {
@@ -52,6 +53,22 @@ class PostbackEvent extends CallbackEvent
     {
         return $this->postback->getPayload();
     }
+
+	/**
+	 * @return boolean
+	 */
+	public function hasPostbackReferral()
+	{
+		return (bool) $this->getPostback()->hasReferral();
+	}
+
+	/**
+	 * @return Referral
+	 */
+	public function getPostbackReferral()
+	{
+		return $this->postback->getReferral();
+	}
 
     /**
      * @return string
