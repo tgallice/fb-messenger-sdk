@@ -21,12 +21,12 @@ class ReferralSpec extends ObjectBehavior
         $this->getRef()->shouldReturn('my-ref');
     }
 
-	function it_has_a_source()
+    function it_has_a_source()
     {
         $this->getSource()->shouldReturn('source');
     }
 
-	function it_has_a_type()
+    function it_has_a_type()
     {
         $this->getType()->shouldReturn('type');
     }

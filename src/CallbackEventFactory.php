@@ -64,10 +64,10 @@ class CallbackEventFactory
             return self::createMessageReadEvent($payload);
         }
 
-		// ReferralEvent
-		if(isset($payload['referral'])) {
-			return self::createReferralEvent($payload);
-		}
+        // ReferralEvent
+        if(isset($payload['referral'])) {
+            return self::createReferralEvent($payload);
+        }
 
         return new RawEvent($payload['sender']['id'], $payload['recipient']['id'], $payload);
     }
@@ -176,7 +176,7 @@ class CallbackEventFactory
         return new MessageReadEvent($senderId, $recipientId, $timestamp, $read);
     }
 
-	/**
+    /**
      * @param array $payload
      *
      * @return ReferralEvent

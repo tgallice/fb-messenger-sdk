@@ -9,24 +9,26 @@ class Referral
      */
     private $ref;
 
-	/**
+    /**
      * @var string
      */
     private $source;
 
-	/**
+    /**
      * @var string
      */
     private $type;
 
     /**
-     * @param string $payload
+     * @param string $ref
+     * @param string $source
+     * @param string $type
      */
     public function __construct($ref, $source, $type)
     {
         $this->ref = $ref;
-		$this->source = $source;
-		$this->type = $type;
+        $this->source = $source;
+        $this->type = $type;
     }
 
     /**
@@ -37,7 +39,7 @@ class Referral
         return $this->ref;
     }
 
-	/**
+    /**
      * @return string
      */
     public function getSource()
@@ -45,7 +47,7 @@ class Referral
         return $this->source;
     }
 
-	/**
+    /**
      * @return string
      */
     public function getType()

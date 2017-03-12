@@ -54,21 +54,21 @@ class PostbackEvent extends CallbackEvent
         return $this->postback->getPayload();
     }
 
-	/**
-	 * @return boolean
-	 */
-	public function hasPostbackReferral()
-	{
-		return (bool) $this->getPostback()->hasReferral();
-	}
+    /**
+     * @return boolean
+     */
+    public function hasPostbackReferral()
+    {
+        return (bool) $this->getPostback()->hasReferral();
+    }
 
-	/**
-	 * @return Referral
-	 */
-	public function getPostbackReferral()
-	{
-		return $this->postback->getReferral();
-	}
+    /**
+     * @return Referral|null
+     */
+    public function getPostbackReferral()
+    {
+        return $this->postback->getReferral();
+    }
 
     /**
      * @return string

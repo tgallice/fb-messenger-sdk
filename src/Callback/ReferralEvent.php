@@ -12,7 +12,7 @@ class ReferralEvent extends CallbackEvent
      * @var int
      */
     private $timestamp;
-	
+
     /**
      * @var Referral
      */
@@ -22,7 +22,7 @@ class ReferralEvent extends CallbackEvent
      * @param string $senderId
      * @param string $recipientId
      * @param int $timestamp
-	 * @param Referral $referral
+     * @param Referral $referral
      */
     public function __construct($senderId, $recipientId, $timestamp, Referral $referral)
     {

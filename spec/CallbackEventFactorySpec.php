@@ -58,9 +58,9 @@ class CallbackEventFactorySpec extends ObjectBehavior
         $event = $this::createMessageEvent($arr);
         $event->shouldBeLike($expectedEvent);
         $event->getMessage()->getAttachments()->shouldBeLike([[
-			"type" => "image",
-			"url" => "http://domain.com/example.jpg"
-		]]);
+            "type" => "image",
+            "url" => "http://domain.com/example.jpg"
+        ]]);
 
         $event2 = $this::create($arr);
         $event2->shouldBeLike($expectedEvent);
@@ -267,23 +267,23 @@ class CallbackEventFactorySpec extends ObjectBehavior
         $event->shouldBeLike($expectedEvent);
     }
 
-	function it_create_a_referral_event()
+    function it_create_a_referral_event()
     {
         $raw = '
             {
-			  "sender":{
-			    "id":"USER_ID"
-			  },
-			  "recipient":{
-			    "id":"PAGE_ID"
-			  },
-			  "timestamp":1458692752478,
-			  "referral": {
-			    "ref": "value",
-			    "source": "SHORTLINK",
-			    "type": "OPEN_THREAD"
-			  }
-			}
+              "sender":{
+                "id":"USER_ID"
+              },
+              "recipient":{
+                "id":"PAGE_ID"
+              },
+              "timestamp":1458692752478,
+              "referral": {
+                "ref": "value",
+                "source": "SHORTLINK",
+                "type": "OPEN_THREAD"
+              }
+            }
         ';
 
         $arr = json_decode($raw, true);

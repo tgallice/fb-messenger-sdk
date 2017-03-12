@@ -22,13 +22,13 @@ class PostbackSpec extends ObjectBehavior
         $this->getPayload()->shouldReturn('my-payload');
     }
 
-	function it_has_a_referral()
+    function it_has_a_referral()
     {
         $referral = $this->getReferral();
         $referral->shouldBeAnInstanceOf(Referral::class);
     }
 
-	function its_referral_can_be_empty()
+    function its_referral_can_be_empty()
     {
         $this->beConstructedWith('my-payload', null);
         $this->hasReferral()->shouldReturn(false);
