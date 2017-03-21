@@ -10,6 +10,7 @@ use Tgallice\FBMessenger\Callback\MessageEchoEvent;
 use Tgallice\FBMessenger\Callback\MessageEvent;
 use Tgallice\FBMessenger\Callback\MessageReadEvent;
 use Tgallice\FBMessenger\Callback\PostbackEvent;
+use Tgallice\FBMessenger\Callback\ReferralEvent;
 use Tgallice\FBMessenger\Callback\RawEvent;
 use Tgallice\FBMessenger\Model\Callback\AccountLinking;
 use Tgallice\FBMessenger\Model\Callback\Delivery;
@@ -18,6 +19,7 @@ use Tgallice\FBMessenger\Model\Callback\MessageEcho;
 use Tgallice\FBMessenger\Model\Callback\Optin;
 use Tgallice\FBMessenger\Model\Callback\Postback;
 use Tgallice\FBMessenger\Model\Callback\Read;
+use Tgallice\FBMessenger\Model\Callback\Referral;
 
 class CallbackEventFactorySpec extends ObjectBehavior
 {
@@ -56,9 +58,9 @@ class CallbackEventFactorySpec extends ObjectBehavior
         $event = $this::createMessageEvent($arr);
         $event->shouldBeLike($expectedEvent);
         $event->getMessage()->getAttachments()->shouldBeLike([[
-			"type" => "image",
-			"url" => "http://domain.com/example.jpg"
-		]]);
+            "type" => "image",
+            "url" => "http://domain.com/example.jpg"
+        ]]);
 
         $event2 = $this::create($arr);
         $event2->shouldBeLike($expectedEvent);
@@ -263,5 +265,35 @@ class CallbackEventFactorySpec extends ObjectBehavior
 
         $event = $this::create($arr);
         $event->shouldBeLike($expectedEvent);
+    }
+
+    function it_create_a_referral_event()
+    {
+        $raw = '
+            {
+              "sender":{
+                "id":"USER_ID"
+              },
+              "recipient":{
+                "id":"PAGE_ID"
+              },
+              "timestamp":1458692752478,
+              "referral": {
+                "ref": "value",
+                "source": "SHORTLINK",
+                "type": "OPEN_THREAD"
+              }
+            }
+        ';
+
+        $arr = json_decode($raw, true);
+
+        $expectedEvent = new ReferralEvent('USER_ID', 'PAGE_ID', 1458692752478, Referral::create($arr['referral']));
+
+        $event = $this::createReferralEvent($arr);
+        $event->shouldBeLike($expectedEvent);
+
+        $event2 = $this::create($arr);
+        $event2->shouldBeLike($expectedEvent);
     }
 }

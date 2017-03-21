@@ -52,4 +52,10 @@ class PostbackEventSpec extends ObjectBehavior
         $postback->getPayload()->willReturn('payload');
         $this->getPostbackPayload()->shouldReturn('payload');
     }
+
+    function its_postback_referral_can_be_empty()
+    {
+        $this->hasPostbackReferral()->shouldReturn(false);
+        $this->getPostbackReferral()->shouldReturn(null);
+    }
 }

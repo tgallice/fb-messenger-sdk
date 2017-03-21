@@ -10,6 +10,7 @@ use Tgallice\FBMessenger\Callback\MessageEchoEvent;
 use Tgallice\FBMessenger\Callback\MessageEvent;
 use Tgallice\FBMessenger\Callback\MessageReadEvent;
 use Tgallice\FBMessenger\Callback\PostbackEvent;
+use Tgallice\FBMessenger\Callback\ReferralEvent;
 use Tgallice\FBMessenger\Callback\RawEvent;
 use Tgallice\FBMessenger\Model\Callback\AccountLinking;
 use Tgallice\FBMessenger\Model\Callback\Delivery;
@@ -18,6 +19,7 @@ use Tgallice\FBMessenger\Model\Callback\MessageEcho;
 use Tgallice\FBMessenger\Model\Callback\Optin;
 use Tgallice\FBMessenger\Model\Callback\Postback;
 use Tgallice\FBMessenger\Model\Callback\Read;
+use Tgallice\FBMessenger\Model\Callback\Referral;
 
 class CallbackEventFactory
 {
@@ -60,6 +62,11 @@ class CallbackEventFactory
         // MessageReadEvent
         if (isset($payload['read'])) {
             return self::createMessageReadEvent($payload);
+        }
+
+        // ReferralEvent
+        if(isset($payload['referral'])) {
+            return self::createReferralEvent($payload);
         }
 
         return new RawEvent($payload['sender']['id'], $payload['recipient']['id'], $payload);
@@ -167,5 +174,20 @@ class CallbackEventFactory
         $timestamp = $payload['timestamp'];
 
         return new MessageReadEvent($senderId, $recipientId, $timestamp, $read);
+    }
+
+    /**
+     * @param array $payload
+     *
+     * @return ReferralEvent
+     */
+    public static function createReferralEvent(array $payload)
+    {
+        $referral = Referral::create($payload['referral']);
+        $senderId = $payload['sender']['id'];
+        $recipientId = $payload['recipient']['id'];
+        $timestamp = $payload['timestamp'];
+
+        return new ReferralEvent($senderId, $recipientId, $timestamp, $referral);
     }
 }
