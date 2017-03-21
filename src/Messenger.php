@@ -43,7 +43,7 @@ class Messenger
     {
         $message = $this->createMessage($message);
         $options = RequestOptionsFactory::createForMessage($recipient, $message, $notificationType);
-        $response = $this->client->send('POST', '/me/messages', null, [], [], $options);
+        $response = $this->client->send('POST', 'me/messages', null, [], [], $options);
         $responseData = $this->decodeResponse($response);
 
         return new MessageResponse($responseData['recipient_id'], $responseData['message_id']);
@@ -80,7 +80,7 @@ class Messenger
             'fields' => implode(',', $fields)
         ];
 
-        $response = $this->client->get(sprintf('/%s', $userId), $query);
+        $response = $this->client->get($userId, $query);
         $data = $this->decodeResponse($response);
 
         return UserProfile::create($data);
@@ -93,7 +93,7 @@ class Messenger
      */
     public function subscribe()
     {
-        $response = $this->client->post('/me/subscribed_apps');
+        $response = $this->client->post('me/subscribed_apps');
         $decoded = $this->decodeResponse($response);
 
         return $decoded['success'];
@@ -190,7 +190,7 @@ class Messenger
      */
     private function postThreadSettings(array $setting)
     {
-        $this->client->post('/me/thread_settings', $setting);
+        $this->client->post('me/thread_settings', $setting);
     }
 
     /**
@@ -198,7 +198,7 @@ class Messenger
      */
     private function deleteThreadSettings(array $setting)
     {
-        $this->client->send('DELETE', '/me/thread_settings', $setting);
+        $this->client->send('DELETE', 'me/thread_settings', $setting);
     }
 
     /**

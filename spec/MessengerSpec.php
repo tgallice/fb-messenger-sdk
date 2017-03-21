@@ -45,7 +45,7 @@ class MessengerSpec extends ObjectBehavior
             'fields' => 'first_name,last_name,profile_pic',
         ];
 
-        $client->get('/user_id', $query)->willReturn($response);
+        $client->get('user_id', $query)->willReturn($response);
 
         $userProfile = new UserProfile([
             'first_name' => 'Peter',
@@ -61,7 +61,7 @@ class MessengerSpec extends ObjectBehavior
     {
         $message->hasFileToUpload()->willReturn(false);
 
-        $client->send('POST', '/me/messages', null, [], [], [
+        $client->send('POST', 'me/messages', null, [], [], [
             RequestOptions::JSON => [
                 'recipient' => ['id' =>'1008372609250235'],
                 'message' => $message,
@@ -83,7 +83,7 @@ class MessengerSpec extends ObjectBehavior
 
     function it_send_text_message_to_user($client, ResponseInterface $response)
     {
-        $client->send('POST', '/me/messages', null, [], [], Argument::that(function ($value) {
+        $client->send('POST', 'me/messages', null, [], [], Argument::that(function ($value) {
             $message = $value['json']['message'];
 
             if (!$message instanceof Message) {
@@ -107,7 +107,7 @@ class MessengerSpec extends ObjectBehavior
 
     function it_send_template_message_to_user($client, Template $template, ResponseInterface $response)
     {
-        $client->send('POST', '/me/messages', null, [], [], Argument::that(function ($value) use ($template) {
+        $client->send('POST', 'me/messages', null, [], [], Argument::that(function ($value) use ($template) {
             $message = $value['json']['message'];
 
             if (!$message instanceof Message) {
@@ -137,7 +137,7 @@ class MessengerSpec extends ObjectBehavior
 
     function it_send_attachment_message_to_user($client, Attachment $attachment, ResponseInterface $response)
     {
-        $client->send('POST', '/me/messages', null, [], [], Argument::that(function ($value) use ($attachment) {
+        $client->send('POST', 'me/messages', null, [], [], Argument::that(function ($value) use ($attachment) {
             $message = $value['json']['message'];
 
             if (!$message instanceof Message) {
@@ -174,7 +174,7 @@ class MessengerSpec extends ObjectBehavior
             }
         ');
 
-        $client->post('/me/subscribed_apps')
+        $client->post('me/subscribed_apps')
             ->willReturn($response);
 
         $this->subscribe()->shouldReturn(true);
@@ -190,7 +190,7 @@ class MessengerSpec extends ObjectBehavior
             ],
         ];
 
-        $client->post('/me/thread_settings', Argument::that(function ($body) use ($expectedBody) {
+        $client->post('me/thread_settings', Argument::that(function ($body) use ($expectedBody) {
             return json_encode($body) === json_encode($expectedBody);
         }))->shouldBeCalled();
 
@@ -203,7 +203,7 @@ class MessengerSpec extends ObjectBehavior
             'setting_type' => 'greeting',
         ];
 
-        $client->send('DELETE', '/me/thread_settings', $body)->shouldBeCalled();
+        $client->send('DELETE', 'me/thread_settings', $body)->shouldBeCalled();
 
         $this->deleteGreetingText();
     }
@@ -218,7 +218,7 @@ class MessengerSpec extends ObjectBehavior
             ],
         ];
 
-        $client->post('/me/thread_settings', Argument::that(function ($body) use ($expectedBody) {
+        $client->post('me/thread_settings', Argument::that(function ($body) use ($expectedBody) {
             return json_encode($body) === json_encode($expectedBody);
         }))->shouldBeCalled();
 
@@ -232,7 +232,7 @@ class MessengerSpec extends ObjectBehavior
             'thread_state' => 'new_thread',
         ];
 
-        $client->send('DELETE', '/me/thread_settings', $body)->shouldBeCalled();
+        $client->send('DELETE', 'me/thread_settings', $body)->shouldBeCalled();
 
         $this->deleteStartedButton();
     }
@@ -253,7 +253,7 @@ class MessengerSpec extends ObjectBehavior
             ]
         ];
 
-        $client->post('/me/thread_settings', $body)->shouldBeCalled();
+        $client->post('me/thread_settings', $body)->shouldBeCalled();
 
         $this->setPersistentMenu([
             $pb1,
@@ -277,7 +277,7 @@ class MessengerSpec extends ObjectBehavior
             'thread_state' => 'existing_thread',
         ];
 
-        $client->send('DELETE', '/me/thread_settings', $body)->shouldBeCalled();
+        $client->send('DELETE', 'me/thread_settings', $body)->shouldBeCalled();
 
         $this->deletePersistentMenu();
     }
