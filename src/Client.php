@@ -163,7 +163,7 @@ class Client
     private function defaultHttpClient()
     {
         return new \GuzzleHttp\Client([
-            'base_uri' => self::API_BASE_URI . self::DEFAULT_API_VERSION,
+            'base_uri' => self::API_BASE_URI . self::DEFAULT_API_VERSION . '/',
             'timeout' => self::DEFAULT_TIMEOUT,
             'connect_timeout' => 10,
         ]);
