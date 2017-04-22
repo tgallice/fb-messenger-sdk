@@ -16,6 +16,7 @@ use Tgallice\FBMessenger\Model\Message;
 use Tgallice\FBMessenger\Model\MessageResponse;
 use Tgallice\FBMessenger\Model\ThreadSetting;
 use Tgallice\FBMessenger\Model\UserProfile;
+use Tgallice\FBMessenger\Model\WhitelistedDomains;
 use Tgallice\FBMessenger\NotificationType;
 use Tgallice\FBMessenger\TypingIndicator;
 
@@ -197,6 +198,54 @@ class MessengerSpec extends ObjectBehavior
         $this->setGreetingText('my text');
     }
 
+    function it_should_define_domain_whitelisting($client)
+    {
+        $expectedBody = [
+            'setting_type' => 'domain_whitelisting',
+            'whitelisted_domains' => ['https://www.google.com'],
+            'domain_action_type' => 'add'
+        ];
+        
+        $client->post('/me/thread_settings', Argument::that(function ($body) use ($expectedBody) {
+            return json_encode($body) === json_encode($expectedBody);
+        }))->shouldBeCalled();
+        
+        $this->setDomainWhitelisting(['https://www.google.com']);
+    }
+    
+    function it_get_domain_whitelisting($client, ResponseInterface $response)
+    {
+        $response->getBody()->willReturn('
+            {
+                "data" : [{
+                    "whitelisted_domains" : [
+                        "domain_1",
+                        "domain_2"
+                    ],
+                    "id" : "123456"
+                }]
+            }
+        ');
+        
+        $query = [
+            'fields' => 'whitelisted_domains', 
+        ];
+        
+        $client->get('/me/thread_settings', $query)->willReturn($response);
+    
+        $whitelistedDomains = new WhitelistedDomains([
+            'data' => [[
+                'whitelisted_domains' => [
+                    'domain_1',
+                    'domain_2'
+                ],
+                'id' => '123456'
+    		]]
+        ]);
+        
+        $this->getDomainWhitelisting()->shouldBeLike($whitelistedDomains);
+    }
+    
     function it_should_delete_greeting_text($client)
     {
         $body = [
