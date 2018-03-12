@@ -9,7 +9,7 @@ Implementation of the Facebook Messenger Platform API.
 
 **Still under development...**
 
-## Install:
+## Install:
 
 Via composer:
 
