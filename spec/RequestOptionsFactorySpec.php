@@ -23,6 +23,10 @@ class RequestOptionsFactorySpec extends ObjectBehavior
         $this::createForMessage('rid', $message, 'notif')->shouldReturn([
             RequestOptions::MULTIPART => [
                 [
+                    'name' => 'messaging_type',
+                    'contents' => 'RESPONSE'
+                ],
+                [
                     'name' => 'recipient',
                     'contents' => json_encode(['id' => 'rid']),
                 ],
@@ -49,6 +53,7 @@ class RequestOptionsFactorySpec extends ObjectBehavior
 
         $this::createForMessage('rid', $message, 'notif')->shouldReturn([
             RequestOptions::JSON => [
+                'messaging_type' => 'RESPONSE',
                 'recipient' => ['id' => 'rid'],
                 'message' => $message,
                 'notification_type' => 'notif'

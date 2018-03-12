@@ -32,10 +32,11 @@ class RequestOptionsFactory
      *
      * @return array
      */
-    public static function createForMessage($recipientOrPhone, Message $message, $notificationType = NotificationType::REGULAR)
+    public static function createForMessage($recipientOrPhone, Message $message, $notificationType = NotificationType::REGULAR, $messagingType = MessagingType::RESPONSE)
     {
         $options = [];
         $data = [
+            'messaging_type' => $messagingType,
             'recipient' => self::createRecipientField($recipientOrPhone),
             'message' => $message,
             'notification_type' => $notificationType,

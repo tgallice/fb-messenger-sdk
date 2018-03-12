@@ -7,6 +7,7 @@ use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Psr\Http\Message\ResponseInterface;
 use Tgallice\FBMessenger\Client;
+use Tgallice\FBMessenger\MessagingType;
 use Tgallice\FBMessenger\Model\Attachment;
 use Tgallice\FBMessenger\Model\Attachment\Template;
 use Tgallice\FBMessenger\Model\Button;
@@ -63,6 +64,7 @@ class MessengerSpec extends ObjectBehavior
 
         $client->send('POST', '/me/messages', null, [], [], [
             RequestOptions::JSON => [
+                'messaging_type' => MessagingType::RESPONSE,
                 'recipient' => ['id' =>'1008372609250235'],
                 'message' => $message,
                 'notification_type' => NotificationType::REGULAR,
