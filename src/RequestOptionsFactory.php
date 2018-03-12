@@ -47,6 +47,10 @@ class RequestOptionsFactory
             // Create a multipart request
             $options[RequestOptions::MULTIPART] = [
                 [
+                  'name' => 'messaging_type',
+                  'contents' => $messagingType
+                ],
+                [
                     'name' => 'recipient',
                     'contents' => json_encode($data['recipient']),
                 ],
