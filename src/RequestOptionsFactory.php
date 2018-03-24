@@ -32,10 +32,11 @@ class RequestOptionsFactory
      *
      * @return array
      */
-    public static function createForMessage($recipientOrPhone, Message $message, $notificationType = NotificationType::REGULAR)
+    public static function createForMessage($recipientOrPhone, Message $message, $notificationType = NotificationType::REGULAR, $messagingType = MessagingType::RESPONSE)
     {
         $options = [];
         $data = [
+            'messaging_type' => $messagingType,
             'recipient' => self::createRecipientField($recipientOrPhone),
             'message' => $message,
             'notification_type' => $notificationType,
@@ -45,6 +46,10 @@ class RequestOptionsFactory
 
             // Create a multipart request
             $options[RequestOptions::MULTIPART] = [
+                [
+                  'name' => 'messaging_type',
+                  'contents' => $messagingType
+                ],
                 [
                     'name' => 'recipient',
                     'contents' => json_encode($data['recipient']),

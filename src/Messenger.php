@@ -39,10 +39,10 @@ class Messenger
      *
      * @throws ApiException
      */
-    public function sendMessage($recipient, $message, $notificationType = NotificationType::REGULAR)
+    public function sendMessage($recipient, $message, $notificationType = NotificationType::REGULAR, $messagingType = MessagingType::RESPONSE)
     {
         $message = $this->createMessage($message);
-        $options = RequestOptionsFactory::createForMessage($recipient, $message, $notificationType);
+        $options = RequestOptionsFactory::createForMessage($recipient, $message, $notificationType, $messagingType);
         $response = $this->client->send('POST', '/me/messages', null, [], [], $options);
         $responseData = $this->decodeResponse($response);
 
