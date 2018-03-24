@@ -6,6 +6,8 @@ abstract class QuickReply implements \JsonSerializable
 {
     const TYPE_TEXT = 'text';
     const TYPE_LOCATION = 'location';
+    const TYPE_USER_PHONE_NUMBER = 'user_phone_number';
+    const TYPE_USER_EMAIL = 'user_email';
     
     /**
      * @var string
