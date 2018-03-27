@@ -43,6 +43,11 @@ class WebUrlSpec extends ObjectBehavior
         $this->getWebviewHeightRatio()->shouldReturn(WebUrl::HEIGHT_RATIO_FULL);
     }
 
+    function it_has_a_webview_share_button()
+    {
+        $this->getWebviewShareButton()->shouldReturn(WebUrl::WEBVIEW_SHARE_BUTTON_SHOW);
+    }
+
     function it_not_using_messenger_extensions()
     {
         $this->useMessengerExtensions()->shouldReturn(false);
@@ -57,6 +62,12 @@ class WebUrlSpec extends ObjectBehavior
     {
         $this->setWebviewHeightRatio(WebUrl::HEIGHT_RATIO_TALL);
         $this->getWebviewHeightRatio()->shouldReturn(WebUrl::HEIGHT_RATIO_TALL);
+    }
+
+    function its_webview_share_button_is_mutable()
+    {
+        $this->setWebviewShareButton(WebUrl::WEBVIEW_SHARE_BUTTON_HIDE);
+        $this->getWebviewShareButton()->shouldReturn(WebUrl::WEBVIEW_SHARE_BUTTON_HIDE);
     }
 
     function its_messenger_extensions_is_mutable()
@@ -87,6 +98,7 @@ class WebUrlSpec extends ObjectBehavior
             'title' => 'title',
             'url' => 'http://www.google.com',
             'webview_height_ratio' => 'full',
+            'webview_share_button' => 'show'
         ];
 
         $this->jsonSerialize()->shouldBeLike($expected);
@@ -102,6 +114,7 @@ class WebUrlSpec extends ObjectBehavior
             'title' => 'title',
             'url' => 'http://www.google.com',
             'webview_height_ratio' => 'full',
+            'webview_share_button' => 'show',
             'messenger_extensions' => true,
             'fallback_url' => 'fallback url',
         ];
