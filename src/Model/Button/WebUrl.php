@@ -10,6 +10,9 @@ class WebUrl extends Button
     const HEIGHT_RATIO_COMPACT = 'compact';
     const HEIGHT_RATIO_TALL = 'tall';
 
+    const WEBVIEW_SHARE_BUTTON_SHOW = 'show';
+    const WEBVIEW_SHARE_BUTTON_HIDE = 'hide';
+
     /**
      * @var string
      */
@@ -34,6 +37,11 @@ class WebUrl extends Button
      * @var string|null
      */
     public $fallbackUrl;
+
+    /**
+     * @var string
+     */
+    private $webviewShareButton = self::WEBVIEW_SHARE_BUTTON_SHOW;
 
     /**
      * @param string $title
@@ -117,6 +125,26 @@ class WebUrl extends Button
     }
 
     /**
+     * @param $value
+     */
+    public function setWebviewShareButton($value)
+    {
+        if (!in_array($value, $this->getAllowedWebviewShareButton())) {
+          throw new \InvalidArgumentException(sprintf('Webview share button must be one of this values: [%s]', implode(', ', $this->getAllowedWebviewShareButton())));
+        }
+
+        $this->webviewShareButton = $value;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getWebviewShareButton()
+    {
+      return $this->webviewShareButton;
+    }
+
+    /**
      * @inheritdoc
      */
     public function jsonSerialize()
@@ -128,6 +156,10 @@ class WebUrl extends Button
 
         if (!empty($this->webviewHeightRatio)) {
             $json['webview_height_ratio'] = $this->webviewHeightRatio;
+        }
+
+        if (!empty($this->webviewShareButton)) {
+            $json['webview_share_button'] = $this->webviewShareButton;
         }
 
         if ($this->messengerExtensions) {
@@ -151,5 +183,16 @@ class WebUrl extends Button
             self::HEIGHT_RATIO_COMPACT,
             self::HEIGHT_RATIO_TALL
         ];
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getAllowedWebviewShareButton()
+    {
+      return [
+        self::WEBVIEW_SHARE_BUTTON_SHOW,
+        self::WEBVIEW_SHARE_BUTTON_HIDE
+      ];
     }
 }
