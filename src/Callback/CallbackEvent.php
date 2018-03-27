@@ -38,5 +38,8 @@ abstract class CallbackEvent extends Event
     /**
      * @return string
      */
-    abstract public function getName();
+    public function getName()
+    {
+        return self::NAME;
+    }
 }
