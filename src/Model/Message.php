@@ -31,6 +31,11 @@ class Message implements \JsonSerializable
     private $metadata;
 
     /**
+     * @var null|string
+     */
+    private $tag;
+
+    /**
      * @param string|Attachment $data
      */
     public function __construct($data)
@@ -79,6 +84,14 @@ class Message implements \JsonSerializable
     }
 
     /**
+     * @return null|string
+     */
+    public function getTag()
+    {
+        return $this->tag;
+    }
+
+    /**
      * @param null|QuickReply[] $quickReplies
      */
     public function setQuickReplies(array $quickReplies = null)
@@ -116,6 +129,14 @@ class Message implements \JsonSerializable
         }
 
         $this->metadata = empty($metadata) ? null : $metadata;
+    }
+
+    /**
+     * @param null|string $tag
+     */
+    public function setTag($tag = null)
+    {
+        $this->tag = true === empty($tag) ? null : $tag;
     }
 
     /**

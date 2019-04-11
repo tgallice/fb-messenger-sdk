@@ -41,7 +41,11 @@ class RequestOptionsFactory
             'message' => $message,
             'notification_type' => $notificationType,
         ];
-        
+
+        if ($messagingType === MessagingType::MESSAGE_TAG && false === empty($message->getTag())) {
+            $data['tag'] = $message->getTag();
+        }
+
         if ($message->hasFileToUpload()) {
 
             // Create a multipart request
