@@ -1,5 +1,5 @@
 {
-  "name": "tgallice/fb-messenger-sdk",
+  "name": "whotrades/fb-messenger-sdk",
   "description": "Facebook Messenger Bot php sdk",
   "minimum-stability": "stable",
   "license": "MIT",
@@ -7,6 +7,10 @@
     {
       "name": "Thomas Gallice",
       "email": "tm.gallice@gmail.com"
+    },
+    {
+      "name": "Vladimir Karpov",
+      "email": "vkarpov@corp.finam.ru"
     }
   ],
   "keywords": [
@@ -24,14 +28,15 @@
     }
   },
   "require": {
-    "php": ">=5.5.9",
+    "php": ">=7.4.20",
     "ext-mbstring": "*",
     "guzzlehttp/guzzle": "^6.2",
-    "symfony/polyfill-php56": "^1.2",
-    "symfony/event-dispatcher": "^3.1"
+    "symfony/event-dispatcher": "^4.4|^5.3",
+    "symfony/polyfill-php80": "^1.23",
+    "symfony/polyfill-php81": "^1.23"
   },
   "require-dev": {
-    "phpspec/phpspec": "^2.5"
+    "phpspec/phpspec": "^7.1"
   },
   "extra": {
     "branch-alias": {

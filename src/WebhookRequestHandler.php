@@ -187,16 +187,16 @@ class WebhookRequestHandler
     public function dispatchCallbackEvents()
     {
         foreach ($this->getAllCallbackEvents() as $event) {
-            $this->dispatcher->dispatch($event->getName(), $event);
+            $this->dispatcher->dispatch($event, $event->getName());
 
             if ($event instanceof PostbackEvent) {
                 // Dispatch postback payload
-                $this->dispatcher->dispatch($event->getPostback()->getPayload(), $event);
+                $this->dispatcher->dispatch($event, $event->getPostback()->getPayload());
             }
 
             if ($event instanceof MessageEvent && $event->isQuickReply()) {
                 // Dispatch quick reply payload
-                $this->dispatcher->dispatch($event->getQuickReplyPayload(), $event);
+                $this->dispatcher->dispatch($event, $event->getQuickReplyPayload());
             }
         }
     }

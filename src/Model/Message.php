@@ -95,12 +95,12 @@ class Message implements \JsonSerializable
      */
     public function addQuickReply(QuickReply $quickReply)
     {
-        if (count($this->quickReplies) >= 10) {
-            throw new \InvalidArgumentException('A message can not have more than 10 quick replies.');
-        }
-
         if (!is_array($this->quickReplies)) {
             $this->quickReplies = [];
+        }
+
+        if (count($this->quickReplies) >= 10) {
+            throw new \InvalidArgumentException('A message can not have more than 10 quick replies.');
         }
 
         $this->quickReplies[] = $quickReply;

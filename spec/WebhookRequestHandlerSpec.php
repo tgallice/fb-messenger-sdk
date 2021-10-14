@@ -127,8 +127,8 @@ class WebhookRequestHandlerSpec extends ObjectBehavior
 
     function it_dispatch_events($dispatcher)
     {
-        $dispatcher->dispatch(MessageEvent::NAME, Argument::type(MessageEvent::class))->shouldBeCalled();
-        $dispatcher->dispatch('DEVELOPER_DEFINED_PAYLOAD', Argument::type(MessageEvent::class))->shouldBeCalled();
+        $dispatcher->dispatch(Argument::type(MessageEvent::class), MessageEvent::NAME)->shouldBeCalled();
+        $dispatcher->dispatch(Argument::type(MessageEvent::class), 'DEVELOPER_DEFINED_PAYLOAD')->shouldBeCalled();
         $this->dispatchCallbackEvents();
     }
 
