@@ -31,7 +31,7 @@ class ElementList extends Template
      * @param ButtonModel|null $button
      * @param string $topElementStyle
      */
-    public function __construct(array $elements, ButtonModel $button = null, $topElementStyle = self::TOP_STYLE_LARGE)
+    public function __construct(array $elements, ?ButtonModel $button = null, $topElementStyle = self::TOP_STYLE_LARGE)
     {
         if (empty($elements) || (count($elements) < 2 || count($elements) > 4)) {
             throw new \InvalidArgumentException('You must provide between 2 and 4 elements.');

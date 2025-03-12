@@ -5,7 +5,7 @@ namespace Tgallice\FBMessenger;
 use GuzzleHttp\Psr7\ServerRequest;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Tgallice\FBMessenger\Callback\CallbackEvent;
 use Tgallice\FBMessenger\Callback\MessageEvent;
@@ -56,7 +56,7 @@ class WebhookRequestHandler
      * @param $verifyToken
      * @param EventDispatcherInterface|null $dispatcher
      */
-    public function __construct($secret, $verifyToken, EventDispatcherInterface $dispatcher = null)
+    public function __construct($secret, $verifyToken, ?EventDispatcherInterface $dispatcher = null)
     {
         $this->secret = $secret;
         $this->verifyToken = $verifyToken;
@@ -100,6 +100,34 @@ class WebhookRequestHandler
         $params = $this->getRequest()->getQueryParams();
 
         return isset($params['hub_challenge']) ? $params['hub_challenge'] : null;
+    }
+
+    public function isValidInstagramCallbackRequest()
+    {
+        if (!$this->isValidHubSignature()) {
+            return false;
+        }
+
+        $decoded = $this->getDecodedBody();
+
+        $object = isset($decoded['object']) ? $decoded['object'] : null;
+        $entry = isset($decoded['entry']) ? $decoded['entry'] : null;
+
+        return $object === 'instagram' && null !== $entry;
+    }
+
+    public function isValidWhatsAppCallbackRequest()
+    {
+        if (!$this->isValidHubSignature()) {
+            return false;
+        }
+
+        $decoded = $this->getDecodedBody();
+
+        $object = isset($decoded['object']) ? $decoded['object'] : null;
+        $entry = isset($decoded['entry']) ? $decoded['entry'] : null;
+
+        return $object === 'whatsapp_business_account' && null !== $entry;
     }
 
     /**
@@ -249,7 +277,12 @@ class WebhookRequestHandler
      */
     private function isValidHubSignature()
     {
-        $headers = $this->getRequest()->getHeader('X-Hub-Signature');
+        if (isset($_SERVER['HTTP_X_HUB_SIGNATURE'])){
+            $headers = array();
+            $headers[] = $_SERVER['HTTP_X_HUB_SIGNATURE'];
+        } else {
+            $headers = $this->getRequest()->getHeader('X-Hub-Signature');
+        }
 
         if (empty($headers)) {
             return false;

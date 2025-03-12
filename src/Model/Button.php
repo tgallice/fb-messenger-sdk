@@ -36,6 +36,7 @@ abstract class Button implements \JsonSerializable
     /**
      * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         $json = [

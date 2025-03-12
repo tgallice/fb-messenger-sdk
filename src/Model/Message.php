@@ -81,7 +81,7 @@ class Message implements \JsonSerializable
     /**
      * @param null|QuickReply[] $quickReplies
      */
-    public function setQuickReplies(array $quickReplies = null)
+    public function setQuickReplies(?array $quickReplies = null)
     {
         if (count($quickReplies) > 10) {
             throw new \InvalidArgumentException('A message can not have more than 10 quick replies.');
@@ -149,6 +149,7 @@ class Message implements \JsonSerializable
     /**
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return [

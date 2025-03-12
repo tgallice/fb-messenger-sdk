@@ -29,6 +29,8 @@ class Message
      */
     private $quickReply;
 
+    private $isReply = false;
+
     /**
      * @param string $id
      * @param int $sequence
@@ -36,13 +38,15 @@ class Message
      * @param array $attachments
      * @param null|string $quickReply
      */
-    public function __construct($id, $sequence, $text = null, array $attachments = [], $quickReply = null)
+    public function __construct($id, $sequence, $text = null, array $attachments = [], $quickReply = null, $isReply = false)
     {
         $this->id = $id;
         $this->sequence = $sequence;
         $this->text = $text;
         $this->attachments = $attachments;
         $this->quickReply = $quickReply;
+        $this->isReply = $isReply;
+
     }
 
     /**
@@ -59,6 +63,11 @@ class Message
     public function getSequence()
     {
         return $this->sequence;
+    }
+
+    public function hasReply()
+    {
+        return $this->isReply;
     }
 
     /**
@@ -143,7 +152,8 @@ class Message
         $text = isset($payload['text']) ? $payload['text'] : null;
         $attachments = isset($payload['attachments']) ? $payload['attachments'] : [];
         $quickReply = isset($payload['quick_reply']) ? $payload['quick_reply']['payload'] : null;
+        $isReply = isset($payload['reply_to']);
 
-        return new static($payload['mid'], $payload['seq'], $text, $attachments, $quickReply);
+        return new static($payload['mid'], $payload['seq'], $text, $attachments, $quickReply, $isReply);
     }
 }

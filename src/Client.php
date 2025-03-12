@@ -50,7 +50,7 @@ class Client
      */
     private $lastResponse;
 
-    public function __construct($accessToken, ClientInterface $httpClient = null)
+    public function __construct($accessToken, ?ClientInterface $httpClient = null)
     {
         $this->accessToken = $accessToken;
         $this->client = $httpClient ?: $this->defaultHttpClient();

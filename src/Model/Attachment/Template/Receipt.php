@@ -186,7 +186,7 @@ class Receipt extends Template
     /**
      * @param null|Address $address
      */
-    public function setAddress(Address $address = null)
+    public function setAddress(?Address $address = null)
     {
         $this->address = $address;
     }

@@ -21,7 +21,7 @@ class Element extends AbstractElement
     /**
      * @param string $title
      */
-    public function __construct($title, $subtitle = null, $imageUrl = null, array $buttons = null, DefaultAction $defaultAction = null)
+    public function __construct($title, $subtitle = null, $imageUrl = null, ?array $buttons = null, ?DefaultAction $defaultAction = null)
     {
         parent::__construct($title, $subtitle, $imageUrl);
 

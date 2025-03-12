@@ -11,6 +11,7 @@ class UserProfile
     const TIMEZONE = 'timezone';
     const GENDER = 'gender';
     const PAYMENT_ENABLED = 'is_payment_enabled';
+    const INSTAGRAM_NAME = 'name';
 
     /**
      * @var array
@@ -31,6 +32,11 @@ class UserProfile
     public function getFirstName()
     {
         return $this->get(self::FIRST_NAME);
+    }
+
+    public function getName()
+    {
+        return $this->get(self::INSTAGRAM_NAME);
     }
 
     /**
@@ -78,7 +84,7 @@ class UserProfile
      */
     public function isPaymentEnabled()
     {
-        return (bool) $this->get(self::PAYMENT_ENABLED);
+        return (bool) false;//$this->get(self::PAYMENT_ENABLED);
     }
 
     private function get($index)

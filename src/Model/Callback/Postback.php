@@ -18,7 +18,7 @@ class Postback
      * @param string $payload
      * @param Referral|null $referral
      */
-    public function __construct($payload, Referral $referral = null)
+    public function __construct($payload, ?Referral $referral = null)
     {
         $this->payload = $payload;
         $this->referral = $referral;

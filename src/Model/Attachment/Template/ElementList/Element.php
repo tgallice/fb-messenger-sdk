@@ -25,7 +25,7 @@ class Element extends AbstractElement
      * @param Button|null $button
      * @param DefaultAction|null $defaultAction
      */
-    public function __construct($title, $subtitle = null, $imageUrl = null, Button $button = null, DefaultAction $defaultAction = null)
+    public function __construct($title, $subtitle = null, $imageUrl = null, ?Button $button = null, ?DefaultAction $defaultAction = null)
     {
         parent::__construct($title, $subtitle, $imageUrl);
         $this->button = $button;

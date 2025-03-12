@@ -7,6 +7,7 @@ use Tgallice\FBMessenger\Callback\AuthenticationEvent;
 use Tgallice\FBMessenger\Callback\CallbackEvent;
 use Tgallice\FBMessenger\Callback\MessageDeliveryEvent;
 use Tgallice\FBMessenger\Callback\MessageEchoEvent;
+use Tgallice\FBMessenger\Callback\MessageDeleteEvent;
 use Tgallice\FBMessenger\Callback\MessageEvent;
 use Tgallice\FBMessenger\Callback\MessageReadEvent;
 use Tgallice\FBMessenger\Callback\PostbackEvent;
@@ -16,6 +17,7 @@ use Tgallice\FBMessenger\Model\Callback\AccountLinking;
 use Tgallice\FBMessenger\Model\Callback\Delivery;
 use Tgallice\FBMessenger\Model\Callback\Message;
 use Tgallice\FBMessenger\Model\Callback\MessageEcho;
+use Tgallice\FBMessenger\Model\Callback\MessageDelete;
 use Tgallice\FBMessenger\Model\Callback\Optin;
 use Tgallice\FBMessenger\Model\Callback\Postback;
 use Tgallice\FBMessenger\Model\Callback\Read;
@@ -34,6 +36,10 @@ class CallbackEventFactory
         if (isset($payload['message'])) {
             if (isset($payload['message']['is_echo'])) {
                 return self::createMessageEchoEvent($payload);
+            }
+
+            if (isset($payload['message']['is_deleted'])) {
+                return self::createMessageDeleteEvent($payload);
             }
 
             return self::createMessageEvent($payload);
@@ -100,6 +106,21 @@ class CallbackEventFactory
         $timestamp = $payload['timestamp'];
 
         return new MessageEchoEvent($senderId, $recipientId, $timestamp, $message);
+    }
+
+    /**
+     * @param array $payload
+     *
+     * @return MessageDeleteEvent
+     */
+    public static function createMessageDeleteEvent(array $payload)
+    {
+        $message = MessageDelete::create($payload['message']);
+        $senderId = $payload['sender']['id'];
+        $recipientId = $payload['recipient']['id'];
+        $timestamp = $payload['timestamp'];
+
+        return new MessageDeleteEvent($senderId, $recipientId, $timestamp, $message);
     }
 
     /**
